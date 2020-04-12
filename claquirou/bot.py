@@ -63,7 +63,7 @@ async def start(event):
     start_msg = getTips("START")
     message = f"{greeting} {user.first_name}.\n{start_msg}"
 
-    await event.respond(message, parse_mode="md")
+    await event.respond(message)
     await new_user(user.id, user.first_name, user.last_name)
 
     raise events.StopPropagation
@@ -86,7 +86,7 @@ async def option(event):
     user = event.chat
     chat_id = event.chat_id
     await new_user(chat_id, user.first_name, user.last_name)
-    
+
     keyboard = [
         [Button.inline("Recherche Web🌍", b"1"),
         Button.inline("Recherche d'Image📸", b"2")],
@@ -195,7 +195,7 @@ async def admin(event):
 
 async def new_user(chat_id, first_name, last_name):
     database = UserBot()
-
+    print("ICI")
     get_user = await database.select_data
     all_user = [i[0] for i in get_user]
     if chat_id not in all_user:
