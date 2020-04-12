@@ -195,7 +195,6 @@ async def admin(event):
 
 async def new_user(chat_id, first_name, last_name):
     database = UserBot()
-    print("ICI")
     get_user = await database.select_data
     all_user = [i[0] for i in get_user]
     if chat_id not in all_user:
