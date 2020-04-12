@@ -195,10 +195,10 @@ async def admin(event):
 
 async def new_user(chat_id, first_name, last_name):
     database = UserBot()
-    get_user = await database.select_data
-    all_user = [i[0] for i in get_user]
 
     try:
+        get_user = await database.select_data
+        all_user = [i[0] for i in get_user]
         if chat_id not in all_user:
             await database.add_data(chat_id, first_name, last_name)
             new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
