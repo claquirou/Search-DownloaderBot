@@ -66,7 +66,7 @@ async def start(event):
         start_msg = getTips("START")
         message = f"{greeting} {user.first_name}.\n{start_msg}"
 
-        await event.respond(message, parse_mode="html")
+        await event.respond(message, parse_mode="md")
         await new_user(user.id, user.first_name, user.last_name)
 
         raise events.StopPropagation
@@ -173,10 +173,10 @@ async def conv(chat_id, tips, search=None, cmd=None):
 @client.on(events.NewMessage)
 async def media(event):
     if event.file:
-        await event.reply("Types de fichiers non pris en charge pour le moment. Ressayez plus tard...")
+        await event.reply("Types de fichiers non pris en charge pour le moment. Ressayez plus tard...\n\nAppuyez sur **/options** pour afficher les options", parse_mode="md")
         new_logger(event.chat_id).debug("FILE")
     elif event.contact:
-        await event.respond("Vos contacts doivent rester privés!")
+        await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options", parse_mode="md")
 
 
 @client.on(events.NewMessage(pattern="/users"))
@@ -205,6 +205,7 @@ async def new_user(chat_id, first_name, last_name):
     
     except:
         await database.add_data(chat_id, first_name, last_name)
+        new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
 
 
 async def send_user():
@@ -223,7 +224,6 @@ def getTips(tips):
         data = json.load(f)
 
     return data.get(tips)
-
 
 def run():
     client.run_until_disconnected()

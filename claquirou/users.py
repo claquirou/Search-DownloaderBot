@@ -2,7 +2,7 @@ import os
 import psycopg2
 
 DATABASE_URL = os.environ['DATABASE_URL']
-# DATABASE_URL = "postgres://xkimwgnucflqrz:fe509e3c0ccc68bdecb004cb294875a8bb4dd6698e0c6d255bb3be16a12b6fa9@ec2-46-137-177-160.eu-west-1.compute.amazonaws.com:5432/dls48gf8nv0ko"
+# DATABASE_URL = "postgres://jsyycamnrliaqp:fb5d7dab0ccbfcffbfa1ba55c5ed660a3471d032b74b7d2ab9fd320110f95617@ec2-46-137-84-140.eu-west-1.compute.amazonaws.com:5432/d6juremsp6ctc1"
 
 
 class UserBot:
