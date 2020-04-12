@@ -26,7 +26,7 @@ import worker.tgaction as tgaction
 import worker.thumb as thumb
 
 
-TOKEN = "923335949:AAFtm2Gih4fMu6Omd8hGRXeNqXpRrzkZqKk"
+TOKEN = os.environ["TOKEN"]
 _bot = Bot(TOKEN)
 
 
