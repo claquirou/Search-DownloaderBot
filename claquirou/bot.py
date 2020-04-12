@@ -86,6 +86,9 @@ async def help(event):
 
 @client.on(events.NewMessage(pattern="/options"))
 async def option(event):
+    user = event.chat
+    chat_id = event.chat_id
+    
     keyboard = [
         [Button.inline("Recherche Web🌍", b"1"),
         Button.inline("Recherche d'Image📸", b"2")],
@@ -96,15 +99,15 @@ async def option(event):
         [Button.inline("Données Métérologiques🌦", b"5")]
     ]
 
-    await client.send_message(event.chat_id, "Choississez une option:", buttons=keyboard)
+    await client.send_message(chat_id, "Choississez une option:", buttons=keyboard)
+    new_user(chat_id, user.first_name, user.last_name)
+
     raise events.StopPropagation
 
 
 @client.on(events.CallbackQuery)
 async def button(event):
     chat_id = event.chat_id
-    user = event.chat
-    new_user(chat_id, user.first_name, user.last_name)
 
     if event.data == b"1":
         await event.delete()
@@ -196,14 +199,9 @@ async def admin(event):
 async def new_user(chat_id, first_name, last_name):
     database = UserBot()
 
-    try:
-        get_user = await database.select_data
-        all_user = [i[0] for i in get_user]
-        if chat_id not in all_user:
-            await database.add_data(chat_id, first_name, last_name)
-            new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
-    
-    except:
+    get_user = await database.select_data
+    all_user = [i[0] for i in get_user]
+    if chat_id not in all_user:
         await database.add_data(chat_id, first_name, last_name)
         new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
 
