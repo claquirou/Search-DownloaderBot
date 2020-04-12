@@ -87,3 +87,8 @@ Vent: {data.get("wind")},
         
         except AttributeError:
             return "Ville incorrecte! Assurez d'avoir bien saisie le nom de la ville"
+
+
+if __name__ == "__main__":
+    a = Search()
+    print(a.results("Port 5454541Boulet"))

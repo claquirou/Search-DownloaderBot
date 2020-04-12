@@ -1,4 +1,4 @@
-Ce bot vous permet de faire des recherches **web**, **d’images**, **météo** et aussi de **convertir en audio ou télécharger des vidéos en ligne voir la [liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)**...
+Ce bot vous permet de faire des recherches **web**, **d’images**, **météo** et aussi de **convertir en audio ou télécharger des vidéos en ligne**...
 Pour afficher les options disponible, appuyez sur /options ou sur n'importe quel touche du clavier.
 
 -- Pour les recherches web, il suffit juste de choisir l'option **Recherche Web**, lisez ensuite l'astuce qui s'affiche et faite vos recherche!\nPour avoir de resultats pertinents soyez surtout clair et précis.
@@ -28,15 +28,7 @@ Exemples:
 
 **INFORMATION IMPORTANTE**
 Si vous êtes dans une conversation et que vous souhaitez choisir d'autre options, tapez sur /end .
-Pendant 60 secondes d'inactivité dans une conversation, le bot se charge de vous ramener au menu en affichant les options.
-
-Pour enregistré les vidéos ou audio dans votre galeries ou fichier audio:
-
-__ iOS __
-Une fois le bot vous ramène la vidéo souhaité attendez que la vidéo ou l'audio soit télécharger et appuyez sur la petite icone carré et sur enregistrer l'image...
-
-__ ANDROID __
-Une fois le bot vous ramène la vidéo où souhaité attendez que la vidéo ou l'audio soit télécharger et appuyez sur les trois petit points et sur télécharger...
+Pendant 60 secondes d'inactivité dans une conversation, le bot se charge de vous ramener au menu.
 
 
 **** Si vous constatez des erreurs ou des bugs, n'hésitez pas à m'envoyer un message avec une capture pour corriger le bug @herve1774 ****
