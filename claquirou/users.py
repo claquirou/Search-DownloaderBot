@@ -23,7 +23,7 @@ class UserBot:
         )
 
     async def add_data(self, user_id, first_name, last_name):
-        self._create_table()
+        await self._create_table()
         
         self.cursor.execute(
             f"""
