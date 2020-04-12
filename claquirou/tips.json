@@ -1,0 +1,9 @@
+{
+    "START": "Nous sommes heureux de vous compter parmi nos utilisateurs 😉.Appuyez sur **/options** où sur n'importe quel touche du clavier ⌨️ pour afficher les options.\n\nPour savoir comment le bot fonctionne, appuyez sur **/help**",
+    "WEB": "Astuce:\n**Pour faire des recherches Web🌍, c'est tout simple, ecrivez, demandez et posez des question** 😃",
+    "IMAGE": "Astuce:\n**Pour faire des recherches d'Images, écrivez le nom de l'image suivi du nombre d'image📸 que vous voulez.** ",
+    "AUDIO": "Astuce:\n**Pour avoir l'audio d'une vidéo Facebook, Youtube etc... Voir [liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html) il vous suffit juste de coller le 🔗lien de la vidéo** 😉",
+    "VIDEO": "Astuce:\n**Pour télécharger une vidéo Facebook, Instagram, Youtube etc... Voir [liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html), il vous suffit juste de coller le 🔗lien de la vidéo** 😉",
+    "METEO": "Astuce:\n**Pour avoir la météo⛈ d'une ville, écrivez juste le nom de la ville🗺**. \n__C'est cool non__🤗",
+    "END": "Merci d'avoir utilisée notre service 😉.\nPour afficher les options, appuyez sur n'importe quel touche du clavier ⌨️."
+}

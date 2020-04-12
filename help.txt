@@ -1,0 +1,42 @@
+Ce bot vous permet de faire des recherches **web**, **d’images**, **météo** et aussi de **convertir en audio ou télécharger des vidéos en ligne voir la [liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)**...
+Pour afficher les options disponible, appuyez sur /options ou sur n'importe quel touche du clavier.
+
+-- Pour les recherches web, il suffit juste de choisir l'option **Recherche Web**, lisez ensuite l'astuce qui s'affiche et faite vos recherche!\nPour avoir de resultats pertinents soyez surtout clair et précis.
+Exemples:
+- Le meilleur joueur du monde.
+- Qu’est ce qu’une fièvre ?
+- Synonyme de voir
+- Qui a crée Facebook ?
+
+-- Pour les recherches d'image, il suffit juste de choisir l'option **Recherche d'Image**, lisez ensuite l'astuce qui s'affiche et ecrivez le nom de l'image suivi du nombre d'image que vous souhaitez.
+Exemples:
+- Ballon d'or 2
+- Mohamed Sallah 15
+- Iphone 11 Pro Max 25
+- Elephant 50
+
+-- Pour la météo, il suffit juste de choisir l'option **Données Métérologiques**, lisez ensuite l'astuce qui s'affiche et ecrivez juste le nom de la ville.
+Exemples:
+- Abidjan
+- Londre
+- Bamako
+- Washington
+
+-- Pour l'audio et la vidéo, il suffit juste de choisir l'option **Audio** ou **Vidéo**, lisez ensuite l'astuce qui s'affiche et envoyez juste le lien de la vidéo au bot et il se chargera de vous renvoyez l'audio ou la vidéo.
+Exemples:
+- Le lien d'une vidéo Facebook, Instagram, Twitter, TikTok où Youtube etc...[liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)
+
+**INFORMATION IMPORTANTE**
+Si vous êtes dans une conversation et que vous souhaitez choisir d'autre options, tapez sur /end .
+Pendant 60 secondes d'inactivité dans une conversation, le bot se charge de vous ramener au menu en affichant les options.
+
+Pour enregistré les vidéos ou audio dans votre galeries ou fichier audio:
+
+__ iOS __
+Une fois le bot vous ramène la vidéo souhaité attendez que la vidéo ou l'audio soit télécharger et appuyez sur la petite icone carré et sur enregistrer l'image...
+
+__ ANDROID __
+Une fois le bot vous ramène la vidéo où souhaité attendez que la vidéo ou l'audio soit télécharger et appuyez sur les trois petit points et sur télécharger...
+
+
+**** Si vous constatez des erreurs ou des bugs, n'hésitez pas à m'envoyer un message avec une capture pour corriger le bug @herve1774 ****
