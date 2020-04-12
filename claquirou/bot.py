@@ -51,25 +51,22 @@ async def typing_action(chat_id, period=3):
 
 @client.on(events.NewMessage(pattern="/start"))
 async def start(event):
-    if event.via_bot:
-        return 
+    user = event.chat
+    await typing_action(event.chat_id)
+    
+    now = time.strftime("%H", time.gmtime())
+    if 4 < int(now) < 18:
+        greeting = "Bonjour"
     else:
-        user = event.chat
-        await typing_action(event.chat_id)
-        
-        now = time.strftime("%H", time.gmtime())
-        if 4 < int(now) < 18:
-            greeting = "Bonjour"
-        else:
-            greeting = "Bonsoir"
+        greeting = "Bonsoir"
 
-        start_msg = getTips("START")
-        message = f"{greeting} {user.first_name}.\n{start_msg}"
+    start_msg = getTips("START")
+    message = f"{greeting} {user.first_name}.\n{start_msg}"
 
-        await event.respond(message, parse_mode="md")
-        await new_user(user.id, user.first_name, user.last_name)
+    await event.respond(message, parse_mode="md")
+    await new_user(user.id, user.first_name, user.last_name)
 
-        raise events.StopPropagation
+    raise events.StopPropagation
 
 @client.on(events.NewMessage(pattern="/help"))
 async def help(event):
@@ -88,6 +85,7 @@ async def help(event):
 async def option(event):
     user = event.chat
     chat_id = event.chat_id
+    await new_user(chat_id, user.first_name, user.last_name)
     
     keyboard = [
         [Button.inline("Recherche Web🌍", b"1"),
@@ -100,7 +98,6 @@ async def option(event):
     ]
 
     await client.send_message(chat_id, "Choississez une option:", buttons=keyboard)
-    new_user(chat_id, user.first_name, user.last_name)
 
     raise events.StopPropagation
 
