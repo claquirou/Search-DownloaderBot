@@ -49,15 +49,6 @@ async def typing_action(chat_id, period=3):
         await asyncio.sleep(period)
 
 
-@client.on(events.NewMessage)
-async def media(event):
-    if event.file:
-        await event.reply("Types de fichiers non pris en charge pour le moment. Ressayez plus tard...")
-        new_logger(event.chat_id).debug("FILE")
-    elif event.contact:
-        await event.respond("Vos contacts doivent rester privés!")
-    
-
 @client.on(events.NewMessage(pattern="/start"))
 async def start(event):
     if event.via_bot:
@@ -112,6 +103,8 @@ async def option(event):
 @client.on(events.CallbackQuery)
 async def button(event):
     chat_id = event.chat_id
+    user = event.chat
+    new_user(chat_id, user.first_name, user.last_name)
 
     if event.data == b"1":
         await event.delete()
@@ -176,6 +169,16 @@ async def conv(chat_id, tips, search=None, cmd=None):
             await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**")
 
 
+
+@client.on(events.NewMessage)
+async def media(event):
+    if event.file:
+        await event.reply("Types de fichiers non pris en charge pour le moment. Ressayez plus tard...")
+        new_logger(event.chat_id).debug("FILE")
+    elif event.contact:
+        await event.respond("Vos contacts doivent rester privés!")
+
+
 @client.on(events.NewMessage(pattern="/users"))
 async def admin(event):
     chat_id = event.chat_id
@@ -195,9 +198,13 @@ async def new_user(chat_id, first_name, last_name):
     get_user = await database.select_data
     all_user = [i[0] for i in get_user]
 
-    if chat_id not in all_user:
+    try:
+        if chat_id not in all_user:
+            await database.add_data(chat_id, first_name, last_name)
+            new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
+    
+    except:
         await database.add_data(chat_id, first_name, last_name)
-        new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
 
 
 async def send_user():
