@@ -28,7 +28,7 @@ class UserBot:
         self.cursor.execute(
             f"""
             INSERT INTO botUser (identifiant, nom, prenom)
-            SELECT '{user_id}', '{first_name.capitalize()}', '{last_name.capitalize()}'
+            SELECT '{user_id}', '{first_name}', '{last_name}'
             WHERE NOT EXISTS (SELECT * FROM botuser WHERE identifiant = '{user_id}' AND nom = '{first_name}' AND prenom = '{last_name}')
             """
         )
