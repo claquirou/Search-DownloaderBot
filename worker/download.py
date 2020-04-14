@@ -103,10 +103,6 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
     if cmd == 'a':
         # audio cmd
         y_format = audio_format
-    elif cmd == 'w':
-        # wordst video cmd
-        y_format = worst_video_format
-    
 
     preferred_formats = None
     if cmd != 'a':

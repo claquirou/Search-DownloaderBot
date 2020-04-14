@@ -149,7 +149,7 @@ async def conv(chat_id, tips, search=None, cmd=None):
                             # message = "Cette option est en maintenance pour le moment. Veuillez ressayer plus-tard..."
                             # await conv.send_message(message)
 
-                            images = await send_images(response.raw_text)
+                            images = send_images(response.raw_text)
                             number = images[-1]
 
                             try:
