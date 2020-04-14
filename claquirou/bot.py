@@ -19,19 +19,19 @@ from worker.download import send_files
 # config = configparser.ConfigParser()
 # config.read(PARAMS)
 
-API_ID = config["DEFAULT"]["API_ID"]
-API_HASH = config["DEFAULT"]["API_HASH"]
-TOKEN = config["DEFAULT"]["TOKEN"]
+# API_ID = config["DEFAULT"]["API_ID"]
+# API_HASH = config["DEFAULT"]["API_HASH"]
+# TOKEN = config["DEFAULT"]["TOKEN"]
 
-# API_ID = os.environ["API_ID"]
-# API_HASH = os.environ["API_HASH"]
-# TOKEN = os.environ["TOKEN"]
-# SESSION = os.environ["SESSION"]
+API_ID = os.environ["API_ID"]
+API_HASH = os.environ["API_HASH"]
+TOKEN = os.environ["TOKEN"]
+SESSION = os.environ["SESSION"]
 
 ADMIN_ID = [711322052]
 
-# client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
-client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
+client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
+# client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
 
 def new_logger(user_id):
     logger = logging.Logger("")
