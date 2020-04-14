@@ -27,6 +27,7 @@ import worker.thumb as thumb
 
 
 TOKEN = os.environ["TOKEN"]
+# TOKEN = "751185862:AAHQ21D01OUELDvEzbhDs-dEkTpy1Nl2OFI"
 _bot = Bot(TOKEN)
 
 

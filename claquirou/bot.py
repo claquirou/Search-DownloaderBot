@@ -14,24 +14,24 @@ from claquirou.constant import PARAMS, TIPS_DIR
 from claquirou.search import Search, Weather
 from claquirou.users import UserBot
 from worker.download import send_files
-from claquirou.image import send_images
+# from claquirou.image import send_images
 
 # config = configparser.ConfigParser()
 # config.read(PARAMS)
 
-# API_ID = config["DEFAULT"]["API_ID"]
-# API_HASH = config["DEFAULT"]["API_HASH"]
-# TOKEN = config["DEFAULT"]["TOKEN"]
+API_ID = config["DEFAULT"]["API_ID"]
+API_HASH = config["DEFAULT"]["API_HASH"]
+TOKEN = config["DEFAULT"]["TOKEN"]
 
-API_ID = os.environ["API_ID"]
-API_HASH = os.environ["API_HASH"]
-TOKEN = os.environ["TOKEN"]
-SESSION = os.environ["SESSION"]
+# API_ID = os.environ["API_ID"]
+# API_HASH = os.environ["API_HASH"]
+# TOKEN = os.environ["TOKEN"]
+# SESSION = os.environ["SESSION"]
 
 ADMIN_ID = [711322052]
 
-client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
-# client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
+# client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
+client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
 
 def new_logger(user_id):
     logger = logging.Logger("")
@@ -145,28 +145,18 @@ async def conv(chat_id, tips, search=None, cmd=None):
                 if response.raw_text != "/end":
                     if search is not None:
                         if search == "image":
-                            images = send_images(response.raw_text)
-                            number = images[-1]
-
-                            try:
-                                for img in images[0:number]:
-                                    await typing_action(chat_id, chat_action="photo", period=2)
-                                    try:
-                                        await conv.send_file(img)
-                                    except:
-                                        continue
-                            except:
-                                await conv.send_message(images)
+                            await typing_action(chat_id, period=2)
+                            message = "Cette option est en maintenance pour le moment. Veuillez ressayer plus-tard..."
+                            await conv.send_message(message)
 
                         else:
                             await typing_action(chat_id, period=5)
-                            try:
-                                result = search.results(response.raw_text)
-                                await conv.send_message(result)
-                            except:
-                                await conv.send_message("Désoler, recherche non trouvée...\nNous améliorions la qualité de nos services, vous serez informé quand elle sera disponible.")
+                            result = search.results(response.raw_text)
+                            await conv.send_message(result)
                         
                         new_logger(chat_id).info(f"Recherche- {response.raw_text}")
+
+
                     
                     else: 
                         if cmd == "a":
