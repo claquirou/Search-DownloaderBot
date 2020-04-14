@@ -10,7 +10,7 @@ chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 
 
-def send_images(query):
+async def send_images(query):
     query = query.split()
     img_number = query.pop(-1)
 
@@ -32,7 +32,7 @@ def send_images(query):
     
 
 # Scrap image
-def initialise_requests(url, number):
+async def initialise_requests(url, number):
     browser = webdriver.Chrome(executable_path=os.environ["CHROMEDRIVER_PATH"], chrome_options=chrome_options)
     # browser = webdriver.Chrome("/home/claquirou/Bureau/AllTest/chromedriver")
     browser.get(url)
