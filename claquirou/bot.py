@@ -159,7 +159,7 @@ async def conv(chat_id, tips, search=None, cmd=None):
                                 await conv.send_message(images)
 
                         else:
-                            await typing_action(chat_id, 5)
+                            await typing_action(chat_id, period=5)
                             try:
                                 result = search.results(response.raw_text)
                                 await conv.send_message(result)
