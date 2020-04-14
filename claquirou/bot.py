@@ -14,7 +14,7 @@ from claquirou.constant import PARAMS, TIPS_DIR
 from claquirou.search import Search, Weather
 from claquirou.users import UserBot
 from worker.download import send_files
-# from claquirou.image import send_images
+from claquirou.image import send_images
 
 # config = configparser.ConfigParser()
 # config.read(PARAMS)
@@ -145,9 +145,22 @@ async def conv(chat_id, tips, search=None, cmd=None):
                 if response.raw_text != "/end":
                     if search is not None:
                         if search == "image":
-                            await typing_action(chat_id, period=2)
-                            message = "Cette option est en maintenance pour le moment. Veuillez ressayer plus-tard..."
-                            await conv.send_message(message)
+                            # await typing_action(chat_id, period=2)
+                            # message = "Cette option est en maintenance pour le moment. Veuillez ressayer plus-tard..."
+                            # await conv.send_message(message)
+
+                            images = send_images(response.raw_text)
+                            number = images[-1]
+
+                            try:
+                                for img in images[0:number]:
+                                    await typing_action(chat_id, chat_action="photo", period=1)
+                                    try:
+                                        await conv.send_file(img)
+                                    except:
+                                        continue
+                            except:
+                                await conv.send_message(images)
 
                         else:
                             await typing_action(chat_id, period=5)
@@ -159,10 +172,17 @@ async def conv(chat_id, tips, search=None, cmd=None):
 
                     
                     else: 
+                        error = "Assurez vous que le lien de la vidéo est correct.\nN'hesitez pas à jeeter un coup d'oeil à la [liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)" 
                         if cmd == "a":
-                            await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd, log=new_logger(chat_id))
+                            try:
+                                await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd, log=new_logger(chat_id))
+                            except:
+                                await conv.send_message(error, parse_mode="md")
                         else:
-                            await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd, log=new_logger(chat_id))
+                            try:
+                                await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd, log=new_logger(chat_id))
+                            except:
+                                await conv.send_message(error, parse_mode="md")
                     
                 else:
                     await conv.send_message(getTips("END"))

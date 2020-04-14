@@ -14,16 +14,13 @@ chrome_options.add_argument("--no-sandbox")
 
 def send_images(query):
     query = query.split()
-    print(query)
     img_number = query.pop(-1)
-    print(img_number)
 
     if "".join(query).isdigit():
         return "Faites des recherches précises svp..."
 
     try:
         number = int(img_number)
-        print(type(number))
         if number > 15:
             return "Le nombre de l'image doit être inférieur ou égale à 15.\nVeuillez réessayer svp."
         else:
@@ -32,7 +29,7 @@ def send_images(query):
             images = initialise_requests(url, number)
             return images
     
-    except:
+    except ValueError:
         return "Format incorrect !\nVous avez fait une erreur, le nombre de l'image doit être un nombre entier."
     
 
@@ -40,7 +37,6 @@ def send_images(query):
 def initialise_requests(url, number):
     browser = webdriver.Chrome(execution_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
     # browser = webdriver.Chrome("/home/claquirou/Bureau/AllTest/chromedriver")
-    webdriver.Chrome()
     browser.get(url)
     extensions = {"jpg", "jpeg", "png", "gif"}
 
