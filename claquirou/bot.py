@@ -1,5 +1,5 @@
 import asyncio
-# import configparser
+import configparser
 import json
 import logging
 import os
@@ -14,6 +14,7 @@ from claquirou.constant import PARAMS, TIPS_DIR
 from claquirou.search import Search, Weather
 from claquirou.users import UserBot
 from worker.download import send_files
+from claquirou.image import send_images
 
 # config = configparser.ConfigParser()
 # config.read(PARAMS)
@@ -21,7 +22,6 @@ from worker.download import send_files
 # API_ID = config["DEFAULT"]["API_ID"]
 # API_HASH = config["DEFAULT"]["API_HASH"]
 # TOKEN = config["DEFAULT"]["TOKEN"]
-# SESSION = os.environ["SESSION"]
 
 API_ID = os.environ["API_ID"]
 API_HASH = os.environ["API_HASH"]
@@ -31,6 +31,7 @@ SESSION = os.environ["SESSION"]
 ADMIN_ID = [711322052]
 
 client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
+# client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
 
 def new_logger(user_id):
     logger = logging.Logger("")
@@ -44,8 +45,8 @@ def new_logger(user_id):
     return logger
 
 
-async def typing_action(chat_id, period=3):
-    async with client.action(chat_id, "typing"):
+async def typing_action(chat_id, chat_action="typing", period=3):
+    async with client.action(chat_id, chat_action):
         await asyncio.sleep(period)
 
 
@@ -131,7 +132,7 @@ async def button(event):
 
 
 async def conv(chat_id, tips, search=None, cmd=None):
-    async with client.conversation(chat_id, timeout=60) as conv:
+    async with client.conversation(chat_id, timeout=65) as conv:
         msg = "\n\nPour mettre fin à la conversation où choisir une autre option, appuyez sur **/end** ." 
         await conv.send_message(tips + msg, parse_mode="md")
 
@@ -144,9 +145,18 @@ async def conv(chat_id, tips, search=None, cmd=None):
                 if response.raw_text != "/end":
                     if search is not None:
                         if search == "image":
-                            await typing_action(chat_id, 2)
-                            message = "Cette option est en maintenance pour le moment. Veuillez ressayer plus-tard..."
-                            await conv.send_message(message)
+                            images = send_images(response.raw_text)
+                            number = images[-1]
+
+                            try:
+                                for img in images[0:number]:
+                                    await typing_action(chat_id, chat_action="photo", period=2)
+                                    try:
+                                        await conv.send_file(img)
+                                    except:
+                                        continue
+                            except:
+                                await conv.send_message(images)
 
                         else:
                             await typing_action(chat_id, 5)
@@ -188,10 +198,11 @@ async def admin(event):
     await typing_action(chat_id)
     if chat_id not in ADMIN_ID:
         await event.respond("Vous n'êtes pas autorisée à utilisé cette commande.")
-    else:
-        await send_user()
-        await client.send_file(chat_id, "user.json")
-        os.remove("user.json")
+        return 
+    
+    await send_user()
+    await client.send_file(chat_id, "user.json")
+    os.remove("user.json")
         
     raise events.StopPropagation
 
@@ -215,6 +226,35 @@ async def send_user():
 
     with open("user.json", "w") as f:
         json.dump(user, f, indent=4, ensure_ascii=False)
+
+
+# @client.on(events.NewMessage(pattern="/sendMessage"))
+# async def inform_all_user(event):
+#     chat_id = event.chat_id
+#     await typing_action(chat_id)
+#     if chat_id not in ADMIN_ID:
+#         await event.respond("Vous n'êtes pas autorisée à utilisé cette commande.")
+#         return
+
+#     database = UserBot()
+#     get_user = await database.select_data
+
+#     async with client.conversation(event.chat_id) as conv:
+#         await conv.send_message("Quel message souhaitez vous envoyer à vos utilisateurs ?")
+#         response = conv.wait_event(events.NewMessage(incoming=True))
+#         response = await response
+        
+#         split_resp = response.raw_text.split()
+#         try:
+#             await client.send_message(711322052, " ".join(msg))
+#         except Exception as e:
+#             await conv.send_message(e)
+#             continue
+    
+#     await conv.send_message("Votre message a été envoyé avec succès.")
+#     new_logger(chat_id).debug("Message envoyé à tout les utilisateurs.")
+        
+#     raise events.StopPropagation
 
 
 def getTips(tips):

@@ -63,30 +63,6 @@ get_ytb_id_re = re.compile(r'.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user
 single_time_re = re.compile(r' ((2[0-3]|[01]?[0-9]):)?(([0-5]?[0-9]):)?([0-5]?[0-9])(\\.[0-9]+)? ')
 
 
-async def send_screenshot(user_id, msg_txt, url, http_headers=None):
-    time_match = single_time_re.search(msg_txt)
-    pic_time = None
-    if time_match:
-        time_group = time_match.group()
-        pic_time = cut_time.to_isotime(time_group)
-
-    if pic_time:
-        vinfo = await av_utils.av_info(url, http_headers)
-        duration = int(float(vinfo['format'].get('duration', 0)))
-        if cut_time.time_to_seconds(pic_time) >= duration:
-            pic_time = None
-
-    screenshot_data = await av_source.video_screenshot(url,
-                                                       http_headers,
-                                                       screen_time=str(pic_time) if pic_time else None,
-                                                       quality=1)
-    if not screenshot_data:
-        return
-
-    photo = io.BytesIO(screenshot_data)
-    await _bot.send_photo(user_id, photo)
-
-
 def normalize_url_path(url):
     parsed = list(urlparse(url))
     parsed[2] = re.sub("/{2,}", "/", parsed[2])
@@ -258,16 +234,6 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                     if _title == '':
                         entry['title'] = str(msg_id)
 
-                    if cmd == 's':
-                        direct_url = entry.get('url') if formats is None else formats[0].get('url')
-                        if 'invidio.us' in direct_url:
-                            direct_url = normalize_url_path(direct_url)
-
-                        await send_screenshot(chat_id,
-                                              message,
-                                              direct_url,
-                                              http_headers=http_headers)
-                        return
 
                     _cut_time = (cut_time_start, cut_time_end) if cut_time_start else None
                     try:
