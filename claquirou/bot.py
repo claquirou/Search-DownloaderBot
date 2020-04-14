@@ -172,7 +172,7 @@ async def conv(chat_id, tips, search=None, cmd=None):
 
                     
                     else: 
-                        error = "Assurez vous que le lien de la vidéo est correct.\nN'hesitez pas à jeeter un coup d'oeil à la [liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)" 
+                        error = "Assurez vous que le lien de la vidéo est correct.\nN'hesitez pas à jeter un coup d'oeil à la [liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)" 
                         if cmd == "a":
                             try:
                                 await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd, log=new_logger(chat_id))

@@ -1,11 +1,9 @@
 from selenium import webdriver
 import random
-
-GOOGLE_CHROME_PATH = '/app/.apt/usr/bin/google_chrome'
-CHROMEDRIVER_PATH = '/app/.chromedriver/bin/chromedriver'
+import os
 
 chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = GOOGLE_CHROME_PATH
+chrome_options.binary_location = os.environ["GOOGLE_CHROME_BIN"]
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
@@ -35,7 +33,7 @@ def send_images(query):
 
 # Scrap image
 def initialise_requests(url, number):
-    browser = webdriver.Chrome(execution_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+    browser = webdriver.Chrome(executable_path=os.environ["CHROMEDRIVER_PATH"], chrome_options=chrome_options)
     # browser = webdriver.Chrome("/home/claquirou/Bureau/AllTest/chromedriver")
     browser.get(url)
     extensions = {"jpg", "jpeg", "png", "gif"}
