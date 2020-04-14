@@ -22,7 +22,7 @@ def send_images(query):
     try:
         number = int(img_number)
         if number > 15:
-            return "Le nombre de l'image doit être inferieur ou égale à 15.\nVeuillez réessayer svp."
+            return "Le nombre de l'image doit être inférieur ou égale à 15.\nVeuillez réessayer svp."
         else:
             search = "+".join(query)
             url = f"https://www.google.co.in/search?q={search}&source=lnms&tbm=isch"
@@ -33,7 +33,7 @@ def send_images(query):
         return "Format incorrect !\nVous avez fait une erreur, le nombre de l'image doit être un nombre entier."
     
 
-
+# Scrap image
 def initialise_requests(url, number):
     browser = webdriver.Chrome(execution_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
     webdriver.Chrome()
