@@ -42,6 +42,7 @@ TG_CONNECTIONS_COUNT = 0
 MAX_STORAGE_SIZE = 1500 * 1024 * 1024
 STORAGE_SIZE = MAX_STORAGE_SIZE
 
+
 def sizeof_fmt(num, suffix='B'):
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(num) < 1024.0:

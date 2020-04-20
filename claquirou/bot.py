@@ -145,10 +145,6 @@ async def conv(chat_id, tips, search=None, cmd=None):
                 if response.raw_text != "/end":
                     if search is not None:
                         if search == "image":
-                            # await typing_action(chat_id, period=2)
-                            # message = "Cette option est en maintenance pour le moment. Veuillez ressayer plus-tard..."
-                            # await conv.send_message(message)
-
                             images = send_images(response.raw_text)
                             number = images[-1]
 
@@ -226,6 +222,8 @@ async def new_user(chat_id, first_name, last_name):
         await database.add_data(chat_id, first_name, last_name)
         new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
 
+        await client.send_message(711322052, f"Nouvel utilisateur {chat_id}")
+
 
 async def send_user():
     database = await UserBot().select_data
@@ -236,35 +234,6 @@ async def send_user():
 
     with open("user.json", "w") as f:
         json.dump(user, f, indent=4, ensure_ascii=False)
-
-
-# @client.on(events.NewMessage(pattern="/sendMessage"))
-# async def inform_all_user(event):
-#     chat_id = event.chat_id
-#     await typing_action(chat_id)
-#     if chat_id not in ADMIN_ID:
-#         await event.respond("Vous n'êtes pas autorisée à utilisé cette commande.")
-#         return
-
-#     database = UserBot()
-#     get_user = await database.select_data
-
-#     async with client.conversation(event.chat_id) as conv:
-#         await conv.send_message("Quel message souhaitez vous envoyer à vos utilisateurs ?")
-#         response = conv.wait_event(events.NewMessage(incoming=True))
-#         response = await response
-        
-#         split_resp = response.raw_text.split()
-#         try:
-#             await client.send_message(711322052, " ".join(msg))
-#         except Exception as e:
-#             await conv.send_message(e)
-#             continue
-    
-#     await conv.send_message("Votre message a été envoyé avec succès.")
-#     new_logger(chat_id).debug("Message envoyé à tout les utilisateurs.")
-        
-#     raise events.StopPropagation
 
 
 def getTips(tips):
