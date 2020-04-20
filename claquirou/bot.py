@@ -164,7 +164,7 @@ async def conv(chat_id, tips, search=None, cmd=None):
                                 result = search.results(response.raw_text)
                                 await conv.send_message(result)
                             except:
-                                await client.send_message("Désoler, recherche non trouvée...\nNous améliorions la qualité de nos services, vous serez informé quand elle sera disponible.")
+                                await conv.send_message("Désoler, recherche non trouvée...\nNous améliorions la qualité de nos services, vous serez informé quand elle sera disponible.")
                         
                         new_logger(chat_id).info(f"Recherche- {response.raw_text}")
 
