@@ -597,7 +597,7 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                         force_document = False
                         if ext != 'mp4' and cmd != 'a':
                             force_document = True
-                        log.debug('Envoie du fichier en cours...')
+                        log.debug('Fichier envoyé avec succès')
                         video_note = False if cmd == 'a' or force_document else True
                         voice_note = True if cmd == 'a' else False
                         attributes = ((attributes,) if not force_document else None)
