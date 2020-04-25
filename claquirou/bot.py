@@ -14,24 +14,24 @@ from claquirou.constant import PARAMS, TIPS_DIR
 from claquirou.search import Search, Weather
 from claquirou.users import UserBot
 from worker.download import send_files
-# from claquirou.image import send_images
+from claquirou.image import send_images
 
-config = configparser.ConfigParser()
-config.read(PARAMS)
+# config = configparser.ConfigParser()
+# config.read(PARAMS)
 
-API_ID = config["DEFAULT"]["API_ID"]
-API_HASH = config["DEFAULT"]["API_HASH"]
-TOKEN = config["DEFAULT"]["TOKEN"]
+# API_ID = config["DEFAULT"]["API_ID"]
+# API_HASH = config["DEFAULT"]["API_HASH"]
+# TOKEN = config["DEFAULT"]["TOKEN"]
 
-# API_ID = os.environ["API_ID"]
-# API_HASH = os.environ["API_HASH"]
-# TOKEN = os.environ["TOKEN"]
-# SESSION = os.environ["SESSION"]
+API_ID = os.environ["API_ID"]
+API_HASH = os.environ["API_HASH"]
+TOKEN = os.environ["TOKEN"]
+SESSION = os.environ["SESSION"]
 
 ADMIN_ID = [711322052]
 
-# client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
-client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
+client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
+# client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
 
 def new_logger(user_id):
     logger = logging.Logger("")
@@ -129,7 +129,7 @@ async def button(event):
         weather = Weather()
 
         await conv(chat_id=chat_id, tips=getTips("METEO"), search=weather)
-
+    
     raise events.StopPropagation
 
 
@@ -147,9 +147,7 @@ async def conv(chat_id, tips, search=None, cmd=None):
                 if response.raw_text != "/end":
                     if search is not None:
                         if search == "image":
-                            return
-                            # images = send_images(response.raw_text)
-                            images = ""
+                            images = send_images(response.raw_text)
                             number = images[-1]
 
                             try:
@@ -194,6 +192,8 @@ async def conv(chat_id, tips, search=None, cmd=None):
         except asyncio.TimeoutError:
             await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**")
 
+    raise events.StopPropagation
+
 
 
 @client.on(events.NewMessage)
@@ -203,7 +203,7 @@ async def media(event):
         new_logger(event.chat_id).debug("FILE")
     elif event.contact:
         await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options", parse_mode="md")
-    
+
     raise events.StopPropagation
 
 
@@ -244,7 +244,6 @@ async def send_user():
     with open("user.json", "w") as f:
         json.dump(user, f, indent=4, ensure_ascii=False)
 
-    raise events.StopPropagation
 
 def getTips(tips):
     with open(TIPS_DIR, "r") as f:
