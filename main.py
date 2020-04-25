@@ -1,5 +1,4 @@
-# import claquirou.bot as Bot
-import claquirou.maintenance as Bot
+import claquirou.bot as Bot
 
 
 if __name__ == "__main__":
