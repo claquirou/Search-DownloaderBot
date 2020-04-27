@@ -129,8 +129,6 @@ async def button(event):
         weather = Weather()
 
         await conv(chat_id=chat_id, tips=getTips("METEO"), search=weather)
-    
-    raise events.StopPropagation
 
 
 async def conv(chat_id, tips, search=None, cmd=None):
@@ -192,8 +190,6 @@ async def conv(chat_id, tips, search=None, cmd=None):
         except asyncio.TimeoutError:
             await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**")
 
-    raise events.StopPropagation
-
 
 
 @client.on(events.NewMessage)
@@ -203,8 +199,6 @@ async def media(event):
         new_logger(event.chat_id).debug("FILE")
     elif event.contact:
         await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options", parse_mode="md")
-
-    raise events.StopPropagation
 
 
 @client.on(events.NewMessage(pattern="/users"))

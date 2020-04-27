@@ -17,4 +17,3 @@ pip-delete-this-directory.txt
 
 bot.session
 OldBot/
-send_message.py
