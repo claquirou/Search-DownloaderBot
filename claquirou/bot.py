@@ -12,7 +12,7 @@ from telethon.sessions import StringSession
 
 from claquirou.constant import PARAMS, TIPS_DIR
 from claquirou.search import Search, Weather
-from claquirou.users import UserBot
+# from claquirou.users import UserBot
 from worker.download import send_files
 from claquirou.image import send_images
 
@@ -65,7 +65,7 @@ async def start(event):
     message = f"{greeting} {user.first_name}.\n{start_msg}"
 
     await event.respond(message)
-    await new_user(user.id, user.first_name, user.last_name)
+    # await new_user(user.id, user.first_name, user.last_name)
 
     raise events.StopPropagation
 
@@ -86,7 +86,7 @@ async def help(event):
 async def option(event):
     user = event.chat
     chat_id = event.chat_id
-    await new_user(chat_id, user.first_name, user.last_name)
+    # await new_user(chat_id, user.first_name, user.last_name)
 
     keyboard = [
         [Button.inline("Recherche Web🌍", b"1"),
@@ -203,42 +203,42 @@ async def media(event):
         await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options", parse_mode="md")
 
 
-@client.on(events.NewMessage(pattern="/users"))
-async def admin(event):
-    chat_id = event.chat_id
-    await typing_action(chat_id)
-    if chat_id not in ADMIN_ID:
-        await event.respond("Vous n'êtes pas autorisée à utilisé cette commande.")
-        return 
+# @client.on(events.NewMessage(pattern="/users"))
+# async def admin(event):
+#     chat_id = event.chat_id
+#     await typing_action(chat_id)
+#     if chat_id not in ADMIN_ID:
+#         await event.respond("Vous n'êtes pas autorisée à utilisé cette commande.")
+#         return 
     
-    await send_user()
-    await client.send_file(chat_id, "user.json")
-    os.remove("user.json")
+#     await send_user()
+#     await client.send_file(chat_id, "user.json")
+#     os.remove("user.json")
         
-    raise events.StopPropagation
+#     raise events.StopPropagation
 
 
-async def new_user(chat_id, first_name, last_name):
-    database = UserBot()
+# async def new_user(chat_id, first_name, last_name):
+#     database = UserBot()
 
-    get_user = await database.select_data
-    all_user = [i[0] for i in get_user]
-    if chat_id not in all_user:
-        await database.add_data(chat_id, first_name, last_name)
-        new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
+#     get_user = await database.select_data
+#     all_user = [i[0] for i in get_user]
+#     if chat_id not in all_user:
+#         await database.add_data(chat_id, first_name, last_name)
+#         new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
 
-        await client.send_message(711322052, f"Nouvel utilisateur {chat_id}")
+#         await client.send_message(711322052, f"Nouvel utilisateur {chat_id}")
 
 
-async def send_user():
-    database = await UserBot().select_data
-    user = []
-    for i in database:
-        info = {"ID": i[0] ,"Nom": i[1], "Prenom": i[2]}
-        user.append(info)
+# async def send_user():
+#     database = await UserBot().select_data
+#     user = []
+#     for i in database:
+#         info = {"ID": i[0] ,"Nom": i[1], "Prenom": i[2]}
+#         user.append(info)
 
-    with open("user.json", "w") as f:
-        json.dump(user, f, indent=4, ensure_ascii=False)
+#     with open("user.json", "w") as f:
+#         json.dump(user, f, indent=4, ensure_ascii=False)
 
 
 def getTips(tips):

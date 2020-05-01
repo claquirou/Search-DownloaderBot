@@ -13,7 +13,7 @@ async def inform_all_user():
     for i in get_user:
         # message = f"Bonsoir {i[1]}.\nNous tenions à vous informer que le bot sera temporairement indisponible jusqu'a 2:00 GMT en raison d’activités de maintenance...\nBonne soirée."
 
-        message = f"Hey {i[1]}.\nNous avons corrigé un bug qui empêchait le fonctionnement du bot."
+        message = f"Bonjour {i[1]}.\nNous tenions à vous informer que le bot est à nouveau disponible.\nPetite astuce: Pour afficher les options appuyez sur /options et pour mettre fin à une conversation pour faire d'autre choix appuyez sur /end .Pour avoir de l'aide, appuyez sur /help ."
         try:
             bot.send_message(i[0], message)
             print(f"Message envoyé au {i[0]}")
