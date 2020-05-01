@@ -129,6 +129,8 @@ async def button(event):
         weather = Weather()
 
         await conv(chat_id=chat_id, tips=getTips("METEO"), search=weather)
+    
+    raise events.StopPropagation
 
 
 async def conv(chat_id, tips, search=None, cmd=None):
@@ -139,7 +141,7 @@ async def conv(chat_id, tips, search=None, cmd=None):
         try:
             continue_conv = True
             while continue_conv:
-                response = conv.wait_event(events.NewMessage(incoming=True))
+                response = conv.get_response()
                 response = await response
 
                 if response.raw_text != "/end":

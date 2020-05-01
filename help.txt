@@ -10,19 +10,19 @@ Exemples:
 
 -- Pour les recherches d'image, il suffit juste de choisir l'option **Recherche d'Image**, lisez ensuite l'astuce qui s'affiche et ecrivez le nom de l'image suivi du nombre d'image que vous souhaitez.
 Exemples:
-- Ballon d'or 2
-- Mohamed Sallah 15
-- Iphone 11 Pro Max 25
-- Elephant 50
+- Panthère 5
+- Didier Drogba 9
+- Iphone 11 Pro Max 15
+- 
 
 -- Pour la météo, il suffit juste de choisir l'option **Données Métérologiques**, lisez ensuite l'astuce qui s'affiche et ecrivez juste le nom de la ville.
 Exemples:
 - Abidjan
-- Londre
-- Bamako
+- Belin
+- Paris
 - Washington
 
--- Pour l'audio et la vidéo, il suffit juste de choisir l'option **Audio** ou **Vidéo**, lisez ensuite l'astuce qui s'affiche et envoyez juste le lien de la vidéo au bot et il se chargera de vous renvoyez l'audio ou la vidéo.
+-- Pour l'audio et la vidéo, il suffit juste de choisir l'option **Audio** ou **Vidéo**, lisez ensuite l'astuce qui s'affiche et envoyez juste le lien(supporte un ou plusieurs liens à la fois) de la vidéo au bot et il se chargera de vous renvoyez l'audio ou la vidéo.
 Exemples:
 - Le lien d'une vidéo Facebook, Instagram, Twitter, TikTok où Youtube etc...[liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)
 

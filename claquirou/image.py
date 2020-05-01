@@ -34,7 +34,7 @@ def send_images(query):
 # Scrap image
 def initialise_requests(url, number):
     browser = webdriver.Chrome(executable_path=os.environ["CHROMEDRIVER_PATH"], chrome_options=chrome_options)
-    # browser = webdriver.Chrome("/home/claquirou/Bureau/AllTest/chromedriver")
+    # browser = webdriver.Chrome("/home/claquirou/Bureau/MyBot/chromedriver")
     browser.get(url)
     extensions = {"jpg", "jpeg", "png", "gif"}
 
