@@ -142,7 +142,11 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                                         ydl.params['force_generic_extractor'] = True
                                         continue
                                     raise
+                                
+                                # elif e.exc_info is not None and e.exc_info[0] is youtube_dl.utils.ExtractorError and 'The video is not available from your location' in str(e):
+                                #     await client.send_message(chat_id, str(e))
                                 else:
+                                    # await client.send_message(chat_id, str(e))
                                     raise
 
                             break
