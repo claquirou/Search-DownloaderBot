@@ -12,10 +12,10 @@ chrome_options.add_argument("--no-sandbox")
 
 def send_images(query):
     query = query.split()
-    img_number = query.pop(-1)
-
     if "".join(query).isdigit():
-        return "Faites des recherches précises svp..."
+        return "Vous avez uniquement écrit un/des chiffre(s)\nFaites des recherches précises svp..."
+
+    img_number = query.pop(-1)
 
     try:
         number = int(img_number)
@@ -28,7 +28,7 @@ def send_images(query):
             return images
     
     except ValueError:
-        return "Format incorrect !\nVous avez fait une erreur, le nombre de l'image doit être un nombre entier."
+        return "Format incorrect !\nVous avez fait une erreur, écrivez le nom de l'image suivi du nombre d'image que vous voulez."
     
 
 # Scrap image

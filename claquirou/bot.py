@@ -7,15 +7,15 @@ import sys
 import time
 
 import logaugment
+import youtube_dl
 from telethon import Button, TelegramClient, events
 from telethon.sessions import StringSession
 
 from claquirou.constant import PARAMS, TIPS_DIR
+from claquirou.image import send_images
 from claquirou.search import Search, Weather
 from claquirou.users import UserBot
 from worker.download import send_files
-import youtube_dl
-from claquirou.image import send_images
 
 # config = configparser.ConfigParser()
 # config.read(PARAMS)
@@ -69,6 +69,7 @@ async def start(event):
     await new_user(user.id, user.first_name, user.last_name)
 
     raise events.StopPropagation
+
 
 @client.on(events.NewMessage(pattern="/help"))
 async def help(event):
@@ -128,7 +129,6 @@ async def button(event):
     elif event.data == b"5":
         await event.delete()
         weather = Weather()
-
         await conv(chat_id=chat_id, tips=getTips("METEO"), search=weather)
     
     raise events.StopPropagation
@@ -141,6 +141,7 @@ async def conv(chat_id, tips, search=None, cmd=None):
 
         try:
             continue_conv = True
+
             while continue_conv:
                 response = conv.get_response()
                 response = await response
@@ -170,23 +171,15 @@ async def conv(chat_id, tips, search=None, cmd=None):
                                 result = search.other_result(response.raw_text)
                                 await conv.send_message(result)
                         
-                        new_logger(chat_id).info(f"Recherche- {response.raw_text}")
-
-
+                        new_logger(chat_id).info(f"RECHERCHE- {response.raw_text}")
                     
-                    else: 
-                        error = "Assurez vous que le lien de la vidéo est correct.\nN'hesitez pas à jeter un coup d'oeil à la [liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)" 
-                        if cmd == "a":
-                            try:
-                                await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd, log=new_logger(chat_id))
-                            except Exception as e:
-                                await conv.send_message(str(e))
-                        else:
-                            try:
-                                await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd, log=new_logger(chat_id))
-                            except Exception as e:
-                                await conv.send_message(str(e))
-                    
+                    else:
+                        try:
+                            await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd, log=new_logger(chat_id))
+
+                        except Exception as e:
+                            await conv.send_message(str(e))
+                            
                 else:
                     await conv.send_message(getTips("END"))
                     continue_conv = False
@@ -223,6 +216,22 @@ async def admin(event):
     os.remove("user.json")
         
     raise events.StopPropagation
+
+@client.on(events.NewMessage(pattern="/userCount"))
+async def user_count(event):
+    chat_id = event.chat_id
+    
+    await typing_action(chat_id)
+    if chat_id not in ADMIN_ID:
+        await event.respond("Vous n'êtes pas autorisée à utilisé cette commande.")
+        return
+
+    database = await UserBot().select_data
+    i = 0
+    for _ in database:
+        i +=1
+
+    await client.send_message(chat_id, f"Le bot compte au total {i} utilisateurs.")
 
 
 async def new_user(chat_id, first_name, last_name):

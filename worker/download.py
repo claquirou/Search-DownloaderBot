@@ -93,12 +93,10 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
 
     if cmd == 'a':
         preferred_formats = [audio_format]
-        action = "upload_audio"
     else:
         preferred_formats = [vid_hd_format, vid_nhd_format]
-        action = "upload_video"
     
-    async with tgaction.TGAction(_bot, chat_id, action):
+    async with tgaction.TGAction(_bot, chat_id, "upload_document"):
         urls = set(urls)
         for iu, u in enumerate(urls):
             vinfo = None
