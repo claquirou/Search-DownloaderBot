@@ -3,6 +3,7 @@ import configparser
 import json
 import logging
 import os
+import random
 import sys
 import time
 
@@ -50,9 +51,24 @@ async def typing_action(chat_id, chat_action="typing", period=3):
     async with client.action(chat_id, chat_action):
         await asyncio.sleep(period)
 
+    
+@client.on(events.NewMessage(pattern="/tips"))
+async def tips(event):
+    tips_list = [getTips("TIP_1"),
+                getTips("TIP_2"),
+                getTips("TIP_3"),
+                getTips("TIP_4"),
+                getTips("TIP_5"),
+                getTips("TIP_6")]
+
+    await typing_action(event.chat_id)
+    await event.respond(random.choice(tips_list))
+
 
 @client.on(events.NewMessage(pattern="/start"))
 async def start(event):
+    all_users = await user_id()
+
     user = event.chat
     await typing_action(event.chat_id)
     
@@ -62,11 +78,15 @@ async def start(event):
     else:
         greeting = "Bonsoir"
 
-    start_msg = getTips("START")
-    message = f"{greeting} {user.first_name}.\n{start_msg}"
+    if user.id not in all_users:
+        start_msg = getTips("START")
+        message = f"{greeting} {user.first_name}.\n{start_msg}"
 
-    await event.respond(message)
-    await new_user(user.id, user.first_name, user.last_name)
+        await event.respond(message)
+        await new_user(user.id, user.first_name, user.last_name)
+    
+    else:
+        await event.respond(f"{greeting} {user.first_name}.\nAppuyez sur /tips pour avoir des astuces ou /help pour avoir de l'aide.")
 
     raise events.StopPropagation
 
@@ -136,7 +156,7 @@ async def button(event):
 
 async def conv(chat_id, tips, search=None, cmd=None):
     async with client.conversation(chat_id, timeout=65) as conv:
-        msg = "\n\nPour mettre fin à la conversation où choisir une autre option, appuyez sur **/end** ." 
+        msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end** ." 
         await conv.send_message(tips + msg, parse_mode="md")
 
         try:
@@ -234,12 +254,19 @@ async def user_count(event):
     await client.send_message(chat_id, f"Le bot compte au total {i} utilisateurs.")
 
 
-async def new_user(chat_id, first_name, last_name):
+async def user_id():
     database = UserBot()
 
     get_user = await database.select_data
     all_user = [i[0] for i in get_user]
-    if chat_id not in all_user:
+    return all_user
+
+
+async def new_user(chat_id, first_name, last_name):
+    database = UserBot()
+    all_users = await user_id()
+
+    if chat_id not in all_users:
         await database.add_data(chat_id, first_name, last_name)
         new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
 

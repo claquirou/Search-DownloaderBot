@@ -1,7 +1,7 @@
 Ce bot vous permet de faire des recherches **web**, **d’images**, **météo** et aussi de **convertir en audio ou télécharger des vidéos en ligne**...
-Pour afficher les options disponible, appuyez sur /options ou sur n'importe quel touche du clavier.
+Pour afficher les options disponible, appuyez sur /options.
 
--- Pour les recherches web, il suffit juste de choisir l'option **Recherche Web**, lisez ensuite l'astuce qui s'affiche et faite vos recherche!\nPour avoir de resultats pertinents soyez surtout clair et précis.
+-- Pour les recherches web, il suffit juste de choisir l'option **Recherche Web**, lisez ensuite l'astuce qui s'affiche et faite vos recherche!\nPour avoir de resultats pertinents soyez surtout précis(e).
 Exemples:
 - Le meilleur joueur du monde.
 - Qu’est ce qu’une fièvre ?
@@ -13,7 +13,6 @@ Exemples:
 - Panthère 5
 - Didier Drogba 9
 - Iphone 11 Pro Max 15
-- 
 
 -- Pour la météo, il suffit juste de choisir l'option **Données Métérologiques**, lisez ensuite l'astuce qui s'affiche et ecrivez juste le nom de la ville.
 Exemples:

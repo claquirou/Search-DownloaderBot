@@ -29,7 +29,7 @@ class UserBot:
             f"""
             INSERT INTO botUser (identifiant, nom, prenom)
             SELECT '{user_id}', '{first_name}', '{last_name}'
-            WHERE NOT EXISTS (SELECT * FROM botuser WHERE identifiant = '{user_id}' AND nom = '{first_name}' AND prenom = '{last_name}')
+            WHERE NOT EXISTS (SELECT * FROM botuser WHERE identifiant = '{user_id}')
             """
         )
 
