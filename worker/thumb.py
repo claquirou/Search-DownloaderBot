@@ -1,19 +1,21 @@
 
-import aiohttp
 import io
-from PIL import Image
-from math import floor
-import worker.av_source as av_source
-import worker.av_utils as av_utils
 from datetime import timedelta
+from math import floor
 
-async def get_thumbnail(entry):
-    thumb_url = entry.get('thumbnail')
+from aiohttp import ClientSession, TCPConnector
+from PIL import Image
+
+import worker.av_utils as av_utils
+import worker.cut_time as cut_time
+
+
+async def get_thumbnail(thumb_url, entry):
     img_data = None
     if thumb_url is None or thumb_url == 'none':
         img_data = await get_image_from_video(entry['url'], entry['http_headers'])
     else:
-        async with aiohttp.ClientSession() as session:
+        async with ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
             async with session.get(thumb_url) as resp:
                 if resp.status != 200:
                     return None
@@ -56,9 +58,10 @@ async def get_image_from_video(url, headers=None):
     vinfo = await av_utils.av_info(url, headers)
     _format = vinfo.get('format')
     if _format:
-        duration = int(float(vinfo['format']['duration']))
+        duration = int(float(vinfo.get('format', {}).get('duration', 0)))
         duration = int(duration / 3)
     else:
         duration = 5
     time = timedelta(seconds=duration)
     return await av_source.video_screenshot(url, headers, screen_time=time)
+

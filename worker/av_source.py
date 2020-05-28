@@ -4,9 +4,10 @@ import signal
 import time
 import typing
 from datetime import datetime
+from urllib import request
 
 import ffmpeg
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientSession, ClientTimeout, TCPConnector
 
 import worker.av_utils as av_utils
 import worker.cut_time as cut_time
@@ -161,29 +162,32 @@ class FFMpegAV(DumbReader):
                 _format = format_name
             else:
                 _format = ext if ext else 'mp4'
+            if _format == 'mp4':
+                ff.format = _format
+            audio_ext = aformat.get('ext', '') if aformat else ''
+            if _format == 'mp4' and (audio_ext == '' or (audio_ext == 'mp3' or audio_ext == 'm4a')):
+                acodec = 'copy'
+            else:
+                acodec = 'mp3'
 
             if not ff.file_name:
                 _fstream = _finput.output('pipe:',
                                           format=_format,
                                           vcodec='copy',
-                                          acodec='mp3',
+                                          acodec=acodec,
                                           movflags='frag_keyframe')
             else:
-                audio_ext = aformat.get('ext', '')
-                if _format == 'mp4' and (audio_ext == 'mp3' or audio_ext == 'm4a'):
-                    acodec = 'copy'
-                else:
-                    acodec = 'mp3'
                 _fstream = _finput.output(ff.file_name,
                                           format=_format,
                                           vcodec='copy',
-                                          acodec=acodec)
+                                          acodec=acodec,
+                                          movflags='faststart')
 
         cut_time_duration_arg = []
         if cut_time_end is not None:
-            cut_time_duration_arg += ['-t', cut_time_end]
+            cut_time_duration_arg += ['-t', cut_time_end, "-shortest"]
 
-        args = []
+        args = _fstream.compile()
         if aformat:
             # args = _fstream.global_args('headers',
             #                             "\n".join(headers),
@@ -193,7 +197,6 @@ class FFMpegAV(DumbReader):
             #                             '0:v',
             #                             '-map',
             #                             '1:a').compile()
-            args = _fstream.compile()
             if cut_time_start is not None:
                 args = args[:3] + ['-noaccurate_seek', '-ss', cut_time_start] + args[3:5] + ['-headers', headers] + \
                        args[5:-1] + ['-map', '1:v', '-map', '0:a'] + cut_time_duration_arg + \
@@ -203,12 +206,11 @@ class FFMpegAV(DumbReader):
                     '-fs', '1520435200'] + [args[-1]]
 
         else:
-            args = _fstream.compile()
             args = args[:-1] + ['-fs', '1520435200'] + cut_time_duration_arg + cut_time_fix_args + [args[-1]]
-            if cut_time_start is not None and not audio_only:
-                args[args.index('-acodec') + 1] = 'copy'  # copy audio if cutting due to music issue
+            # if cut_time_start is not None and not audio_only:
+            #     args[args.index('-acodec') + 1] = 'copy'  # copy audio if cutting due to music issue
 
-        args = args[:1] + ["-loglevel",  "error", "-icy", "0", "-err_detect", "ignore_err", "-reconnect", "1", "-reconnect_streamed", "1", "-reconnect_delay_max", "5"] + args[1:]
+        args = args[:1] + ["-loglevel",  "error", "-icy", "0", "-err_detect", "ignore_err", "-reconnect", "1", "-reconnect_streamed", "1", "-reconnect_delay_max", "10"] + args[1:]
         if not ff.file_name:
             proc = await asyncio.create_subprocess_exec('ffmpeg',
                                                         *args[1:],
@@ -216,6 +218,17 @@ class FFMpegAV(DumbReader):
         else:
             proc = await asyncio.create_subprocess_exec('ffmpeg',
                                                         *args[1:])
+        if headers != '':
+            await asyncio.sleep(1)
+            if proc.returncode is not None and proc.returncode != 0:
+                return await FFMpegAV.create(vformat,
+                                             aformat=aformat,
+                                             audio_only=audio_only,
+                                             headers='',
+                                             cut_time_range=cut_time_range,
+                                             ext=ext,
+                                             format_name=format_name,
+                                             file_name=file_name)
         ff.stream = proc
 
         return ff
@@ -276,7 +289,7 @@ class URLav(DumbReader):
     async def _create(url, headers=None):
         u = URLav()
         timeout = ClientTimeout(total=3600)
-        u.session = await ClientSession(timeout=timeout).__aenter__()
+        u.session = await ClientSession(timeout=timeout, connector=TCPConnector(verify_ssl=False)).__aenter__()
         u.request = await u.session.get(url, headers=headers)
         # u.request = await asks.get(url, headers=headers, stream=True, max_redirects=5)
         # u.body = u.request.body(timeout=14400)
@@ -304,6 +317,60 @@ class URLav(DumbReader):
     async def close(self) -> None:
         # self.request.release()
         await self.session.__aexit__(exc_type=None, exc_val=None, exc_tb=None)
+
+
+class URLavSync(DumbReader):
+    def __init__(self):
+        self._buf = b''
+
+    @staticmethod
+    def create(url, headers=None):
+        urlav = URLavSync._create(url, headers)
+        if urlav.request.status != 200:
+            urlav.close()
+            urlav = URLavSync._create(url)
+        return urlav
+
+
+    @staticmethod
+    def _create(url, headers=None):
+        u = URLavSync()
+        req = request.Request(url, headers=headers)
+        u.request = request.urlopen(req)
+
+        return u
+
+    def read(self, n: int = -1):
+        buf = b''
+        if len(self._buf) != 0:
+            buf += self._buf
+            self._buf = b''
+        if n == -1:
+            return self.request.read()
+
+        while len(buf) < n:
+            _data = self.request.read(n)
+            if len(_data) == 0:
+                break
+            buf += _data
+        if len(buf) > n != -1:
+            self._buf = buf[n:]
+            return buf[:n]
+        else:
+            return buf
+
+    def close(self) -> None:
+        self.request.release()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        b = self.read(256 * 1024)
+        if len(b) == 0:
+            raise StopIteration()
+        else:
+            return b
 
 
 async def video_screenshot(url, headers=None, screen_time=None, quality=5):
@@ -336,4 +403,10 @@ async def _video_screenshot(url, headers=None, screen_time=None, quality=5):
                                                 stdout=asyncio.subprocess.PIPE,
                                                 stderr=asyncio.subprocess.PIPE)
 
-    return await proc.stdout.read()
+    try:
+        out = await asyncio.wait_for(proc.stdout.read(), timeout=360)
+    except asyncio.TimeoutError as e:
+        os.kill(proc.pid, signal.SIGKILL)
+        print(e)
+        return b'\0'
+    return out

@@ -1,10 +1,12 @@
 import asyncio
 import json
+import os
+import signal
 from http.client import responses
 from urllib.parse import urlparse
 
 import m3u8
-from aiohttp import ClientSession, hdrs
+from aiohttp import ClientSession, TCPConnector, hdrs
 
 
 # convert each key-value to string like "key: value"
@@ -24,33 +26,66 @@ async def av_info(url, http_headers=''):
     return info
 
 async def _av_info(url, http_headers=''):
+    # if use_m3u8:
+    #     m3u8_obj = await asyncio.get_event_loop().run_in_executor(None, m3u8.load, url)
+    #     url = m3u8_obj.segments[0].absolute_uri  # override for mediainfo call
+    #     dur = 0
+    #     for s in m3u8_obj.segments:
+    #         if hasattr(s, 'duration'):
+    #             dur += s.duration
 
     mediainf_args = None
-
+    # if audio_info:
+    #     mediainf_args = '--Inform=Audio;%Duration%'
+    # else:
+    #     mediainf_args = '--Inform=Video;%Width%\\n%Height%\\n%Duration%'
     if http_headers != '':
         http_headers = '\n'.join(dict_to_list(http_headers))
 
     ff_proc = await asyncio.create_subprocess_exec('ffprobe',
                                                    '-v',
                                                    'error',
-                                                   '-select_streams',
-                                                   'v',
                                                    '-show_entries',
-                                                   'stream=width,height',
+                                                   'stream=width,height,codec_name,codec_type',
                                                    '-show_entries',
                                                    'format=duration,format_name',
+                                                   '-show_entries',
+                                                   'format_tags=title,artist',
                                                    '-of',
                                                    'json',
                                                    '-headers',
                                                    http_headers,
                                                    url,
                                                    stdout=asyncio.subprocess.PIPE)
-
-    out = await ff_proc.stdout.read()
+    # mi_proc = subprocess.Popen(['mediainfo', mediainf_args, '2>', '/dev/null', url],
+    #                            stdout=subprocess.PIPE,
+    #                            stderr=subprocess.STDOUT)
+    try:
+        out = await asyncio.wait_for(ff_proc.stdout.read(), timeout=120)
+    except asyncio.TimeoutError as e:
+        os.kill(ff_proc.pid, signal.SIGKILL)
+        print(e)
+        return {}
     info = json.loads(out)
     if 'format' in info and 'duration' in info['format']:
         info['format']['duration'] = int(float(info['format']['duration']))
     return info
+    # out = out.split(b'\n')
+    #
+    # w = h = None
+    # if not audio_info:
+    #     w = int(out[0])
+    #     h = int(out[1])
+    # if use_m3u8:
+    #     dur = int(dur)
+    # else:
+    #     dur = int(int(float(out[2 if not audio_info else 0]))/1000)
+    #
+    # if audio_info:
+    #     return dur
+    # else:
+    #     return w, h, dur
+
 
 async def media_size(url, session=None, http_headers=None):
     content_length = None
@@ -67,7 +102,7 @@ async def media_size(url, session=None, http_headers=None):
 async def _media_size(url, session=None, http_headers=None):
     _session = None
     if session is None:
-        _session = await ClientSession().__aenter__()
+        _session = await ClientSession(connector=TCPConnector(verify_ssl=False)).__aenter__()
     else:
         _session = session
     content_length = 0
@@ -99,21 +134,18 @@ async def _media_size(url, session=None, http_headers=None):
 
 
 async def media_mime(url, http_headers=None):
-    async with ClientSession() as session:
-        async with session.head(url, headers=http_headers, allow_redirects=True) as resp:
-            media_type = ''
-            content_type = resp.content_type
-            if content_type:
-                media_type = content_type.split('/')[0]
-            if media_type != 'audio' and media_type != 'video':
-                async with session.get(url, headers=http_headers) as get_resp:
-                    _content_type = get_resp.headers.getall(hdrs.CONTENT_TYPE)
-                    for ct in _content_type:
-                        _media_type = ct.split('/')[0]
-                        if _media_type == 'audio' or _media_type == 'video':
-                            return ct
-
-            return content_type if content_type is not None else ''
+    async with ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
+        async with session.get(url, headers=http_headers) as get_resp:
+            if get_resp.content_disposition and get_resp.content_disposition.filename:
+                return None, get_resp.content_disposition.filename
+            _content_type = get_resp.headers.getall(hdrs.CONTENT_TYPE)
+            for ct in _content_type:
+                _media_type = ct.split('/')[0]
+                if _media_type == 'audio' or _media_type == 'video':
+                    return ct, None
+            else:
+                if len(_content_type) > 0:
+                    return _content_type[0], None
 
 
 def m3u8_parse_url(url):
@@ -127,7 +159,7 @@ def m3u8_parse_url(url):
 async def m3u8_video_size(url, http_headers=None):
     m3u8_data = None
     m3u8_obj = None
-    async with ClientSession() as session:
+    async with ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
         async with session.get(url, headers=http_headers) as resp:
             m3u8_data = await resp.read()
             m3u8_obj = m3u8.loads(m3u8_data.decode())

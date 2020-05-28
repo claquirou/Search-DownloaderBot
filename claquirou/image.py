@@ -19,7 +19,9 @@ def send_images(query):
 
     try:
         number = int(img_number)
-        if number > 15:
+        if number <= 0:
+            return "Le nombre de l'image doit être supérieur à 0."
+        elif number > 15:
             return "Le nombre de l'image doit être inférieur ou égale à 15.\nVeuillez réessayer svp."
         else:
             search = "+".join(query)

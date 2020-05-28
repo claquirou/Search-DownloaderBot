@@ -51,19 +51,6 @@ async def typing_action(chat_id, chat_action="typing", period=3):
     async with client.action(chat_id, chat_action):
         await asyncio.sleep(period)
 
-    
-@client.on(events.NewMessage(pattern="/tips"))
-async def tips(event):
-    tips_list = [getTips("TIP_1"),
-                getTips("TIP_2"),
-                getTips("TIP_3"),
-                getTips("TIP_4"),
-                getTips("TIP_5"),
-                getTips("TIP_6")]
-
-    await typing_action(event.chat_id)
-    await event.respond(random.choice(tips_list))
-
 
 @client.on(events.NewMessage(pattern="/start"))
 async def start(event):
@@ -86,7 +73,7 @@ async def start(event):
         await new_user(user.id, user.first_name, user.last_name)
     
     else:
-        await event.respond(f"{greeting} {user.first_name}.\nAppuyez sur /tips pour avoir des astuces ou /help pour avoir de l'aide.")
+        await event.respond(f"{greeting} {user.first_name}.\nPour mettre fin à une conversation appuyez sur /end avant de cliquer sur /options pour choisir d'autre options. Pour avoir de l'aide, appuyez sur /help.")
 
     raise events.StopPropagation
 
@@ -215,7 +202,7 @@ async def conv(chat_id, tips, search=None, cmd=None):
 async def media(event):
     if event.file:
         await event.reply("Types de fichiers non pris en charge pour le moment. Ressayez plus tard...\n\nAppuyez sur **/options** pour afficher les options", parse_mode="md")
-        new_logger(event.chat_id).debug("FILE OR CONTACT")
+        new_logger(event.chat_id).debug("FILE")
 
     elif event.contact:
         await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options", parse_mode="md")
@@ -228,7 +215,7 @@ async def admin(event):
     chat_id = event.chat_id
     await typing_action(chat_id)
     if chat_id not in ADMIN_ID:
-        await event.respond("Vous n'êtes pas autorisée à utilisé cette commande.")
+        await event.respond("Vous n'êtes pas autorisé à utilisé cette commande.")
         return 
     
     await send_user()
@@ -243,7 +230,7 @@ async def user_count(event):
     
     await typing_action(chat_id)
     if chat_id not in ADMIN_ID:
-        await event.respond("Vous n'êtes pas autorisée à utilisé cette commande.")
+        await event.respond("Vous n'êtes pas autorisé à utilisé cette commande.")
         return
 
     database = await UserBot().select_data
@@ -291,4 +278,5 @@ def getTips(tips):
     return data.get(tips)
 
 def run():
+    print("Bot demarré avec succès..")
     client.run_until_disconnected()

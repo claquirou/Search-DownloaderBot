@@ -87,12 +87,10 @@ class Weather(Search):
         wind = soup.find(id='wob_ws').text
 
         try:
-            data = f"Localisation: {region}\nDate: {date}\nTempérature: {temperature_now}°C\nDescription: {weather_now}\nPrécipitation: {precipitation}\nHumidité: {humidity}\nVent: {wind}"
+            return f"Localisation: {region}\nDate: {date}\nTempérature: {temperature_now}°C\nDescription: {weather_now}\nPrécipitation: {precipitation}\nHumidité: {humidity}\nVent: {wind}"
         
         except AttributeError:
-            data = "Ville incorrecte! Assurez d'avoir bien saisie le nom de la ville"
-
-        return data
+            return "Ville incorrecte! Assurez d'avoir bien saisie le nom de la ville"
 
 
 if __name__ == "__main__":

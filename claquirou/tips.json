@@ -11,16 +11,6 @@
     
     "METEO": "Astuce:\n**Pour avoir la météo⛈ d'une ville, écrivez juste le nom de la ville🗺**.\n__C'est cool non__🤗",
     
-    "END": "Merci d'avoir utilisé notre service 😉.\nPour afficher les options, appuyez sur **/options**", 
-
-
-
-    "TIP_1": "Pour mettre fin à une conversation et choisir une autre option, appuyez sur /end .",
-    "TIP_2": "Pour afficher les options appuyez sur /options et pour mettre fin à une conversation pour faire d'autre choix appuyez sur /end. Pour avoir de l'aide, appuyez sur /help.",
-
-    "TIP_3": "Pour faire des recherches d'image, il suffit juste de choisir l'option **Recherche d'Image**, lisez ensuite l'astuce qui s'affiche et ecrivez le nom de l'image suivi du nombre d'image que vous souhaitez.",
-    "TIP_4": "Pour faire des recherches métérologiques, il suffit juste de choisir l'option **Données Métérologiques**, lisez ensuite l'astuce qui s'affiche et ecrivez juste le nom de la ville.",
-    "TIP_5": "Pour faire des recherches web, il suffit juste de choisir l'option **Recherche Web**, lisez ensuite l'astuce qui s'affiche et faite vos recherche!\nPour avoir de resultats pertinents soyez surtout clair et précis.",
-    "TIP_6": "Pour faire des téléchargements d'audios ou de vidéos, il suffit juste de choisir l'option **Audio** ou **Vidéo**, lisez ensuite l'astuce qui s'affiche et envoyez juste le lien(supporte un ou plusieurs liens à la fois) de la vidéo au bot et il se chargera de vous renvoyez l'audio ou la vidéo."
+    "END": "Merci d'avoir utilisé notre service 😉.\nPour afficher les options, appuyez sur **/options**",
 
 }
