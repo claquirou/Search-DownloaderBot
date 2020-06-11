@@ -11,11 +11,11 @@ from urllib.parse import urlparse, urlunparse
 import aiofiles
 import youtube_dl
 from aiogram import Bot
-from urlextract import URLExtract
 from telethon.errors import AuthKeyDuplicatedError
 from telethon.tl.types import (DocumentAttributeAudio,
                                DocumentAttributeFilename,
                                DocumentAttributeVideo)
+from urlextract import URLExtract
 
 import worker.av_source as av_source
 import worker.av_utils as av_utils
@@ -23,10 +23,9 @@ import worker.cut_time as cut_time
 import worker.fast_telethon as fast_telethon
 import worker.tgaction as tgaction
 import worker.thumb as thumb
-import worker.zip_file as zip_file
 
 TOKEN = os.environ["TOKEN"]
-# TOKEN = "751185862:AAHQ21D01OUELDvEzbhDs-dEkTpy1Nl2OFI"
+# TOKEN = "1167018060:AAFtkT-TDr3lq-5ShAL0lj5gr0hFwlE7yas"
 _bot = Bot(TOKEN)
 
 url_extractor = URLExtract()
@@ -36,6 +35,7 @@ TG_MAX_PARALLEL_CONNECTIONS = 30
 TG_CONNECTIONS_COUNT = 0
 MAX_STORAGE_SIZE = 1500 * 1024 * 1024
 STORAGE_SIZE = MAX_STORAGE_SIZE
+
 
 def sizeof_fmt(num, suffix='B'):
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
@@ -48,11 +48,11 @@ def sizeof_fmt(num, suffix='B'):
 async def extract_url_info(ydl, url):
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(None,
-                            functools.partial(ydl.extract_info,
-                            download=False,
-                            force_generic_extractor=ydl.params.get(
-                            'force_generic_extractor', False)),
-                            url)
+                                      functools.partial(ydl.extract_info,
+                                                        download=False,
+                                                        force_generic_extractor=ydl.params.get(
+                                                            'force_generic_extractor', False)),
+                                      url)
 
 
 def normalize_url_path(url):
@@ -62,8 +62,10 @@ def normalize_url_path(url):
     return urlunparse(parsed)
 
 
-is_ytb_link_re = re.compile(r'^((?:https?:)?\/\/)?((?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$')
-get_ytb_id_re = re.compile(r'.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user\/[^#]*#([^\/]*?\/)*)\??v?=?([^#\&\?]*).*')
+is_ytb_link_re = re.compile(
+    r'^((?:https?:)?\/\/)?((?:www|m|music)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$')
+get_ytb_id_re = re.compile(
+    r'.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user\/[^#]*#([^\/]*?\/)*)\??v?=?([^#\&\?]*).*')
 
 
 def youtube_to_invidio(url, audio=False):
@@ -104,7 +106,7 @@ def youtube_to_invidio(url, audio=False):
 #         zfile.zip_num += 1
 
 
-async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
+async def send_files(client, chat_id, message, cmd, log):
     global STORAGE_SIZE
 
     log.info(f"URL: {message}")
@@ -112,7 +114,7 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
     urls = url_extractor.find_urls(message)
     if len(urls) == 0:
         await client.send_message(chat_id, "L'URL de la vidéo est incorrect")
-    
+
     playlist_start = None
     playlist_end = None
 
@@ -123,7 +125,6 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
         preferred_formats = [audio_format]
     else:
         preferred_formats = [vid_hd_format, vid_nhd_format]
-
 
     async with tgaction.TGAction(_bot, chat_id, "upload_document"):
         urls = set(urls)
@@ -138,15 +139,14 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                       # 'force_generic_extractor': True if 'invidio.us/watch' in u else False
                       }
 
-            if playlist_start != None and playlist_end != None: #and 'invidio.us/watch' not in u:
+            if playlist_start != None and playlist_end != None:  # and 'invidio.us/watch' not in u:
                 if playlist_start == 0 and playlist_end == 0:
                     params['playliststart'] = 1
                     params['playlistend'] = 10
-                else:
-                    params['playliststart'] = playlist_start
-                    params['playlistend'] = playlist_end
+
             else:
-                params['playlist_items'] = '1'
+                params['playliststart'] = 1
+                params['playlistend'] = 10
 
             ydl = youtube_dl.YoutubeDL(params=params)
             recover_playlist_index = None  # to save last playlist position if finding format failed
@@ -225,7 +225,6 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
 
                         raise
 
-                entries = None
                 if '_type' in vinfo and vinfo['_type'] == 'playlist':
                     entries = vinfo['entries']
                 else:
@@ -249,7 +248,6 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                     if _title == '':
                         entry['title'] = "58450154"
 
-
                     _cut_time = (cut_time_start, cut_time_end) if cut_time_start else None
                     try:
                         if formats is not None:
@@ -269,7 +267,8 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                                             direct_url = f['url']
                                             if 'invidio.us' in direct_url:
                                                 direct_url = normalize_url_path(direct_url)
-                                            _file_size = await av_utils.media_size(direct_url, http_headers=http_headers)
+                                            _file_size = await av_utils.media_size(direct_url,
+                                                                                   http_headers=http_headers)
                                         except Exception as e:
                                             if i < len(formats) - 1 and '404 Not Found' in str(e):
                                                 break
@@ -427,14 +426,16 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                                     log.info(f"Fichier trop volumineux {file_size}")
 
                                     # if 'http' in entry.get('protocol', '') and 'unknown' in entry.get('format', '') and entry.get('ext', '') not in ['unknown_video', 'mp3', 'mp4', 'm4a', 'ogg', 'mkv', 'flv', 'avi', 'webm']:
-                                        
+
                                     #     await upload_multipart_zip(client, entry.get('url'), http_headers, entry['title']+'.'+entry['ext'], _file_size, chat_id, msg_id)
                                     # else:
-                                    await client.send_message(chat_id, f"ERREUR: Taille de fichier multimédia trop grande **{sizeof_fmt(file_size)}**\nTelegram autorise les fichiers moins de **1.5GB**")
-                                    
+                                    await client.send_message(chat_id,
+                                                              f"ERREUR: Taille de fichier multimédia trop grande **{sizeof_fmt(file_size)}**\nTelegram autorise les fichiers moins de **1.5GB**")
+
                                 else:
                                     log.info('Echec de la recherche du format de support approprié')
-                                    await client.send_message(chat_id, "ERREUR: Echec de la recherche du format de support approprié")
+                                    await client.send_message(chat_id,
+                                                              "ERREUR: Echec de la recherche du format de support approprié")
                                 return
 
                             recover_playlist_index = ie
@@ -451,7 +452,9 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                             _file_size += 10 * 1024 * 1024  # 10MB
 
                         log.debug('Fichier en cours de téléchargement...')
-                        await client.send_message(chat_id, "Votre fichier est en cours de telechargement. Patientez quelque seconde.")
+                        await client.send_message(chat_id,
+                                                  "Votre fichier est en cours de telechargement. Patientez quelque "
+                                                  "seconde.")
 
                         width = height = duration = video_codec = audio_codec = None
                         title = performer = None
@@ -543,10 +546,13 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
                         if cut_time_start is not None:
                             if not entry.get('is_live') and duration > 1:
                                 if cut_time.time_to_seconds(cut_time_start) > duration:
-                                    await client.send_message(chat_id,  f"ERROR: L'heure de début est plus longue que la durée du fichier {timedelta(seconds=duration)}")
+                                    await client.send_message(chat_id,
+                                                              f"ERROR: L'heure de début est plus longue que la durée du fichier {timedelta(seconds=duration)}")
                                     return
-                                elif cut_time_end is not None and (cut_time.time_to_seconds(cut_time_end) > duration != 0):
-                                    await client.send_message(chat_id, f"ERROR: L'heure de fin est plus longue que la durée du fichier {timedelta(seconds=duration)}")
+                                elif cut_time_end is not None and (
+                                        cut_time.time_to_seconds(cut_time_end) > duration != 0):
+                                    await client.send_message(chat_id,
+                                                              f"ERROR: L'heure de fin est plus longue que la durée du fichier {timedelta(seconds=duration)}")
                                     return
 
                             if cut_time_end is None:
@@ -727,8 +733,6 @@ async def send_files(client, chat_id, message, cmd, log, msg_id=54540):
 
                 if recover_playlist_index is None:
                     break
-
-
 
 
 vid_hd_format = '((best[ext=mp4][height<=720][height>360])[protocol^=http]/best[ext=mp4][height<=720][height>360]/  (bestvideo[ext=mp4][height<=720][height>360]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio))[protocol^=http]/(bestvideo[ext=mp4][height<=720][height>360])[protocol^=http]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio)/bestvideo[ext=mp4][height<=720][height>360]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio) /  (best[ext=mp4][height<=360])[protocol^=http]/best[ext=mp4][height<=360]/  (bestvideo[ext=mp4][height<=360]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio))[protocol^=http]/(bestvideo[ext=mp4][height<=360])[protocol^=http]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio)/bestvideo[ext=mp4][height<=360]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio)/   best[ext=mp4]   /bestvideo[ext=mp4]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio)/best)[protocol!=http_dash_segments][vcodec !^=? av01]'

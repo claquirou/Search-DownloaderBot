@@ -30,7 +30,8 @@ def send_images(query):
             return images
     
     except ValueError:
-        return "Format incorrect !\nVous avez fait une erreur, écrivez le nom de l'image suivi du nombre d'image que vous voulez."
+        return "Format incorrect !\nVous avez fait une erreur, écrivez le nom de l'image suivi du nombre d'image que " \
+               "vous voulez. "
     
 
 # Scrap image
@@ -51,4 +52,3 @@ def initialise_requests(url, number):
     browser.close()
     
     return images
-
