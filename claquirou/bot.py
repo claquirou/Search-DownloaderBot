@@ -193,8 +193,8 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                                 loop.create_task(
                                     send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
                                                log=new_logger(chat_id)))
-                            except Exception as e:
-                                await conv.send_message(str(e))
+                            except AttributeError:
+                                await conv.send_message("Une erreur s'est produite lors de l'extraction de la vidéo. N'hesitez pas à jeter un coup d'oeil à liste des sites supportés")
 
                     else:
                         await conv.send_message(get_tip("END"))

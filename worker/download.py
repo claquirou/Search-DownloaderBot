@@ -176,7 +176,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                         continue
                                     raise
                                 else:
-                                    client.send_message(chat_id, str(e))
+                                    raise
 
                             break
 
