@@ -4,6 +4,8 @@ import inspect
 import mimetypes
 import os
 import re
+import sys
+import traceback
 from datetime import time, timedelta
 from urllib.error import HTTPError
 from urllib.parse import urlparse, urlunparse
@@ -30,6 +32,59 @@ TG_MAX_PARALLEL_CONNECTIONS = 30
 TG_CONNECTIONS_COUNT = 0
 MAX_STORAGE_SIZE = 1500 * 1024 * 1024
 STORAGE_SIZE = MAX_STORAGE_SIZE
+
+
+async def send_files(client, chat_id, message, cmd, log):
+    try:
+        msg_task = asyncio.get_event_loop().create_task(perform_task(client, chat_id, message, cmd, log))
+        asyncio.get_event_loop().create_task(task_timeout_cancel(msg_task, timemout=21600))
+
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+
+
+async def task_timeout_cancel(task, timemout=5):
+    try:
+        await asyncio.wait_for(task, timeout=timemout)
+    except asyncio.TimeoutError:
+        task.cancel()
+
+
+async def perform_task(client, chat_id, message, cmd, log):
+    try:
+        try:
+            await download_file(client, chat_id, message, cmd, log)
+        except HTTPError as e:
+            # crashing to try change ip
+            # otherwise youtube.com will not allow us
+            # to download any video for some time
+            if e.code == 429:
+                log.critical(e)
+                await shutdown(client)
+            else:
+                log.exception(e)
+                await client.send_message(chat_id, e.__str__())
+        except youtube_dl.DownloadError as e:
+            # crashing to try change ip
+            # otherwise youtube.com will not allow us
+            # to download any video for some time
+            if e.exc_info[0] is HTTPError:
+                if e.exc_info[1].file.code == 429:
+                    log.critical(e)
+                    await shutdown(client)
+
+            log.exception(e)
+            await client.send_message(chat_id, str(e))
+        except Exception as e:
+            log.exception(e)
+            if 'ERROR' not in str(e):
+                err_msg = 'ERROR: ' + str(e)
+            else:
+                err_msg = str(e)
+            await client.send_message(chat_id, err_msg)
+    except Exception as e:
+        log.error(e)
 
 
 def sizeof_fmt(num, suffix='B'):
@@ -93,10 +148,11 @@ async def upload_multipart_zip(client, source, name, file_size, chat_id, log):
                 TG_CONNECTIONS_COUNT -= 2
         else:
             uploaded_file = await client.upload_file(file, file_size=file.size, file_name=file.name)
+
         await client.send_file(chat_id, uploaded_file, caption=str(chat_id))
 
     try:
-        for i in range(0, zfile.zip_parts):
+        for _ in range(0, zfile.zip_parts):
             await upload_torrent_content(zfile)
             zfile.zip_num += 1
     except BadRequestError as e:
@@ -109,7 +165,7 @@ async def upload_multipart_zip(client, source, name, file_size, chat_id, log):
             source.close()
 
 
-async def send_files(client, chat_id, message, cmd, log):
+async def download_file(client, chat_id, message, cmd, log):
     global STORAGE_SIZE
 
     log.info(f"URL: {message}")
@@ -144,10 +200,8 @@ async def send_files(client, chat_id, message, cmd, log):
 
             if playlist_start is not None and playlist_end is not None:  # and 'invidio.us/watch' not in u:
                 params['ignoreerrors'] = True
-                if playlist_start == 0 and playlist_end == 0:
-                    params['playliststart'] = 1
-                    params['playlistend'] = 10
-
+                params['playliststart'] = playlist_start
+                params['playlistend'] = playlist_end
             else:
                 params['playliststart'] = 1
                 params['playlistend'] = 10
@@ -524,7 +578,8 @@ async def send_files(client, chat_id, message, cmd, log):
                                                       int(chosen_format[
                                                               'duration']) if 'duration' not in entry else int(
                                                           entry['duration'])
-                        if 'm3u8' in chosen_format.get('protocol', '') and duration == 0 and ffmpeg_av is not None and cut_time_start is None:
+                        if 'm3u8' in chosen_format.get('protocol',
+                                                       '') and duration == 0 and ffmpeg_av is not None and cut_time_start is None:
                             cut_time_start, cut_time_end = (time(hour=0, minute=0, second=0),
                                                             time(hour=1, minute=0, second=0))
                             _cut_time = (cut_time_start, cut_time_end)
@@ -747,6 +802,7 @@ async def send_files(client, chat_id, message, cmd, log):
                         await client.send_message(chat_id, 'ERREUR INTERNE: réessayez')
                         log.fatal(e)
                         os.abort()
+
                     except Exception as e:
                         if len(preferred_formats) - 1 <= ip:
                             # raise exception for notify user about error
@@ -757,6 +813,11 @@ async def send_files(client, chat_id, message, cmd, log):
 
                 if recover_playlist_index is None:
                     break
+
+
+async def shutdown(client):
+    await client.disconnect()
+    sys.exit(1)
 
 
 vid_hd_format = '((best[ext=mp4][height<=720][height>360])[protocol^=http]/best[ext=mp4][height<=720][height>360]/  (bestvideo[ext=mp4][height<=720][height>360]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio))[protocol^=http]/(bestvideo[ext=mp4][height<=720][height>360])[protocol^=http]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio)/bestvideo[ext=mp4][height<=720][height>360]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio) /  (best[ext=mp4][height<=360])[protocol^=http]/best[ext=mp4][height<=360]/  (bestvideo[ext=mp4][height<=360]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio))[protocol^=http]/(bestvideo[ext=mp4][height<=360])[protocol^=http]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio)/bestvideo[ext=mp4][height<=360]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio)/   best[ext=mp4]   /bestvideo[ext=mp4]+(bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=mp4]/bestaudio)/best)[protocol!=http_dash_segments][vcodec !^=? av01]'

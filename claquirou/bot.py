@@ -2,6 +2,7 @@ import configparser
 import json
 import logging
 import os
+import signal
 import sys
 import time
 import asyncio
@@ -10,13 +11,12 @@ import logaugment
 from telethon import Button, TelegramClient, events
 from telethon.errors import AlreadyInConversationError
 from telethon.sessions import StringSession
-from youtube_dl.utils import DownloadError
 
 from claquirou.constant import PARAMS, TIPS_DIR
 from claquirou.image import send_images
 from claquirou.search import Search, Weather
 from claquirou.users import UserBot
-from worker.download import send_files
+from worker.download import send_files, shutdown
 
 config = configparser.ConfigParser()
 config.read(PARAMS)
@@ -192,10 +192,10 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
 
                         else:
                             try:
-                                loop.create_task(send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
-                                                 log=new_logger(chat_id)))
-                            except asyncio.CancelledError as e:
-                                await conv.send_message(str(e))
+                                await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
+                                            log=new_logger(chat_id))
+                            except Exception as e:
+                                await client.send_message(chat_id, str(e))
 
                     else:
                         await conv.send_message(get_tip("END"))
@@ -292,6 +292,14 @@ def get_tip(tips):
     return data.get(tips)
 
 
+def sig_handler():
+    asyncio.run_coroutine_threadsafe(shutdown(client), asyncio.get_event_loop())
+
+
 def run():
+    client.start()
     print("Bot demarré avec succès..")
+    asyncio.get_event_loop().add_signal_handler(signal.SIGABRT, sig_handler)
+    asyncio.get_event_loop().add_signal_handler(signal.SIGTERM, sig_handler)
+    asyncio.get_event_loop().add_signal_handler(signal.SIGHUP, sig_handler)
     client.run_until_disconnected()
