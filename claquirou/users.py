@@ -8,7 +8,11 @@ DATABASE_URL = os.environ['DATABASE_URL']
 class UserBot:
     def __init__(self):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except psycopg2.InterfaceError:
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         
 
     async def _create_table(self):
