@@ -19,10 +19,10 @@ from telethon.tl.types import (DocumentAttributeAudio,
                                DocumentAttributeVideo)
 from urlextract import URLExtract
 
-from worker import av_source, av_utils, cut_time, fast_telethon, tgaction, thumb, zip_file
+from . import av_source, av_utils, cut_time, fast_telethon, tgaction, thumb, zip_file
 
-# TOKEN = os.environ["TOKEN"]
-TOKEN = "1167018060:AAFtkT-TDr3lq-5ShAL0lj5gr0hFwlE7yas"
+TOKEN = os.environ["TOKEN"]
+# TOKEN = "1167018060:AAFtkT-TDr3lq-5ShAL0lj5gr0hFwlE7yas"
 _bot = Bot(TOKEN)
 
 url_extractor = URLExtract()

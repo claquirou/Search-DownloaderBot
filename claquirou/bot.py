@@ -1,63 +1,19 @@
-import configparser
-import json
-import logging
-import os
 import signal
-import sys
 import time
 import asyncio
 
-import logaugment
-from telethon import Button, TelegramClient, events
+from telethon import Button, events
 from telethon.errors import AlreadyInConversationError
-from telethon.sessions import StringSession
 
-from claquirou.constant import PARAMS, TIPS_DIR
-from claquirou.image import send_images
-from claquirou.search import Search, Weather
-from claquirou.users import UserBot
+from .admin import client, typing_action, get_user_id, new_logger, get_tip, new_user
+from .image import send_images
+from .search import Search, Weather
 from worker.download import send_files, shutdown
-
-config = configparser.ConfigParser()
-config.read(PARAMS)
-
-API_ID = config["DEFAULT"]["API_ID"]
-API_HASH = config["DEFAULT"]["API_HASH"]
-TOKEN = config["DEFAULT"]["TOKEN"]
-
-# API_ID = os.environ["API_ID"]
-# API_HASH = os.environ["API_HASH"]
-# TOKEN = os.environ["TOKEN"]
-# SESSION = os.environ["SESSION"]
-
-ADMIN_ID = [711322052]
-
-# client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
-
-
-client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
-
-
-def new_logger(user):
-    logger = logging.Logger("")
-    logger.setLevel(logging.DEBUG)
-    handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter("[%(levelname)s] <%(id)s>: %(message)s")
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logaugment.set(logger, id=str(user))
-
-    return logger
-
-
-async def typing_action(chat_id, chat_action="typing", period=3):
-    async with client.action(chat_id, chat_action):
-        await asyncio.sleep(period)
 
 
 @client.on(events.NewMessage(pattern="/start"))
 async def start(event):
-    all_users = await user_id()
+    all_users = await get_user_id()
 
     user = event.chat
     await typing_action(event.chat_id)
@@ -186,14 +142,14 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                                 try:
                                     result = search.results(response.raw_text)
                                     await conv.send_message(result)
-                                except ValueError:
+                                except:
                                     result = search.other_result(response.raw_text)
                                     await conv.send_message(result)
 
                         else:
                             try:
                                 await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
-                                            log=new_logger(chat_id))
+                                                 log=new_logger(chat_id))
                             except Exception as e:
                                 await client.send_message(chat_id, str(e))
 
@@ -221,75 +177,6 @@ async def media(event):
         await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options",
                             parse_mode="md")
         new_logger(event.chat_id).debug("CONTACT")
-
-
-@client.on(events.NewMessage(pattern="/users"))
-async def admin(event):
-    chat_id = event.chat_id
-    await typing_action(chat_id)
-    if chat_id not in ADMIN_ID:
-        await event.respond("Vous n'êtes pas autorisé à utilisé cette commande.")
-        return
-
-    await send_user()
-    await client.send_file(chat_id, "user.json")
-    os.remove("user.json")
-
-    raise events.StopPropagation
-
-
-@client.on(events.NewMessage(pattern="/userCount"))
-async def user_count(event):
-    chat_id = event.chat_id
-
-    await typing_action(chat_id)
-    if chat_id not in ADMIN_ID:
-        await event.respond("Vous n'êtes pas autorisé à utilisé cette commande.")
-        return
-
-    database = await UserBot().select_data
-    i = 0
-    for _ in database:
-        i += 1
-
-    await client.send_message(chat_id, f"Le bot compte au total {i} utilisateurs.")
-
-
-async def user_id():
-    database = UserBot()
-
-    get_user = await database.select_data
-    all_user = [i[0] for i in get_user]
-    return all_user
-
-
-async def new_user(chat_id, first_name, last_name):
-    database = UserBot()
-    all_users = await user_id()
-
-    if chat_id not in all_users:
-        await database.add_data(chat_id, first_name, last_name)
-        new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
-
-        await client.send_message(711322052, f"Nouvel utilisateur {chat_id}")
-
-
-async def send_user():
-    database = await UserBot().select_data
-    user = []
-    for i in database:
-        info = {"ID": i[0], "Nom": i[1], "Prenom": i[2]}
-        user.append(info)
-
-    with open("user.json", "w") as f:
-        json.dump(user, f, indent=4, ensure_ascii=False)
-
-
-def get_tip(tips):
-    with open(TIPS_DIR, "r") as f:
-        data = json.load(f)
-
-    return data.get(tips)
 
 
 def sig_handler():

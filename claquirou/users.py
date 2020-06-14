@@ -1,8 +1,8 @@
 import os
 import psycopg2
 
-# DATABASE_URL = os.environ['DATABASE_URL']
-DATABASE_URL = "postgres://jsyycamnrliaqp:fb5d7dab0ccbfcffbfa1ba55c5ed660a3471d032b74b7d2ab9fd320110f95617@ec2-46-137-84-140.eu-west-1.compute.amazonaws.com:5432/d6juremsp6ctc1"
+DATABASE_URL = os.environ['DATABASE_URL']
+# DATABASE_URL = "postgres://jsyycamnrliaqp:fb5d7dab0ccbfcffbfa1ba55c5ed660a3471d032b74b7d2ab9fd320110f95617@ec2-46-137-84-140.eu-west-1.compute.amazonaws.com:5432/d6juremsp6ctc1"
 
 
 class UserBot:
@@ -46,24 +46,3 @@ class UserBot:
         self.conn.commit()
         self.cursor.close()
         self.conn.close()
-
-
-# class UserChoice(UserBot):
-#     def __init__(self):
-#         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-#         self.cursor = self.conn.cursor()
-#         self._create_table()
-
-#     def _create_table(self):
-#         self.cursor.execute(
-#             """
-#         CREATE TABLE IF NOT EXISTS userChoice(
-#             identifiant INT,
-#             choix VARCHAR(100)
-#         ) """
-#         )
-
-#     def add_data(self, user_id, choice):
-#         self.cursor.execute(f"INSERT INTO userChoice (identifiant, choix) VALUES ('{user_id}', '{choice}')")
-
-#         UserChoice.commit_data(self)
