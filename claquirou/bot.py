@@ -10,6 +10,7 @@ import logaugment
 from telethon import Button, TelegramClient, events
 from telethon.errors import AlreadyInConversationError
 from telethon.sessions import StringSession
+from youtube_dl.utils import DownloadError
 
 from claquirou.constant import PARAMS, TIPS_DIR
 from claquirou.image import send_images
@@ -20,21 +21,22 @@ from worker.download import send_files
 config = configparser.ConfigParser()
 config.read(PARAMS)
 
-# API_ID = config["DEFAULT"]["API_ID"]
-# API_HASH = config["DEFAULT"]["API_HASH"]
-# TOKEN = config["DEFAULT"]["TOKEN"]
+API_ID = config["DEFAULT"]["API_ID"]
+API_HASH = config["DEFAULT"]["API_HASH"]
+TOKEN = config["DEFAULT"]["TOKEN"]
 
-API_ID = os.environ["API_ID"]
-API_HASH = os.environ["API_HASH"]
-TOKEN = os.environ["TOKEN"]
-SESSION = os.environ["SESSION"]
+# API_ID = os.environ["API_ID"]
+# API_HASH = os.environ["API_HASH"]
+# TOKEN = os.environ["TOKEN"]
+# SESSION = os.environ["SESSION"]
 
 ADMIN_ID = [711322052]
 
-client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
+# client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
 
 
-# client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
+client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
+
 
 def new_logger(user):
     logger = logging.Logger("")
@@ -126,24 +128,24 @@ async def button(event):
     if event.data == b"1":
         await event.delete()
         search = Search()
-        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("WEB"), search=search))
+        await user_conversation(chat_id=chat_id, tips=get_tip("WEB"), search=search)
 
     elif event.data == b"2":
         await event.delete()
-        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("IMAGE"), search="image"))
+        await user_conversation(chat_id=chat_id, tips=get_tip("IMAGE"), search="image")
 
     elif event.data == b"3":
         await event.delete()
-        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("AUDIO"), cmd="a"))
+        await user_conversation(chat_id=chat_id, tips=get_tip("AUDIO"), cmd="a")
 
     elif event.data == b"4":
         await event.delete()
-        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("VIDEO"), cmd="v"))
+        await user_conversation(chat_id=chat_id, tips=get_tip("VIDEO"), cmd="v")
 
     elif event.data == b"5":
         await event.delete()
         weather = Weather()
-        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("METEO"), search=weather))
+        await user_conversation(chat_id=chat_id, tips=get_tip("METEO"), search=weather)
 
     raise events.StopPropagation
 
@@ -190,11 +192,10 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
 
                         else:
                             try:
-                                loop.create_task(
-                                    send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
-                                               log=new_logger(chat_id)))
-                            except AttributeError:
-                                await conv.send_message("Une erreur s'est produite lors de l'extraction de la vidéo. N'hesitez pas à jeter un coup d'oeil à liste des sites supportés")
+                                loop.create_task(send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
+                                                 log=new_logger(chat_id)))
+                            except asyncio.CancelledError as e:
+                                await conv.send_message(str(e))
 
                     else:
                         await conv.send_message(get_tip("END"))

@@ -6,7 +6,7 @@ from http.client import responses
 from urllib.parse import urlparse
 
 import m3u8
-from aiohttp import ClientSession, TCPConnector, hdrs
+from aiohttp import ClientSession, hdrs, TCPConnector
 
 
 # convert each key-value to string like "key: value"
@@ -17,6 +17,7 @@ def dict_to_list(_dict):
 
     return ret
 
+
 async def av_info(url, http_headers=''):
     info = await _av_info(url, http_headers)
     if len(info.keys()) == 0:
@@ -24,6 +25,7 @@ async def av_info(url, http_headers=''):
         info = await _av_info(url)
 
     return info
+
 
 async def _av_info(url, http_headers=''):
     # if use_m3u8:
@@ -34,7 +36,6 @@ async def _av_info(url, http_headers=''):
     #         if hasattr(s, 'duration'):
     #             dur += s.duration
 
-    mediainf_args = None
     # if audio_info:
     #     mediainf_args = '--Inform=Audio;%Duration%'
     # else:
@@ -50,7 +51,7 @@ async def _av_info(url, http_headers=''):
                                                    '-show_entries',
                                                    'format=duration,format_name',
                                                    '-show_entries',
-                                                   'format_tags=title,artist',
+                                                   'format_tags=title,artist,album',
                                                    '-of',
                                                    'json',
                                                    '-headers',
@@ -99,6 +100,7 @@ async def media_size(url, session=None, http_headers=None):
 
     return await _media_size(url, session)
 
+
 async def _media_size(url, session=None, http_headers=None):
     _session = None
     if session is None:
@@ -112,8 +114,11 @@ async def _media_size(url, session=None, http_headers=None):
                 print('Request to url {} failed: '.format(url) + responses[resp.status])
             else:
                 content_length = int(resp.headers.get(hdrs.CONTENT_LENGTH, '0'))
+    except Exception as e:
+        print(e)
 
-        # try GET request when HEAD failed
+    # try GET request when HEAD failed
+    try:
         if content_length < 100:
             async with _session.get(url, headers=http_headers) as get_resp:
                 if get_resp.status != 200:
@@ -157,8 +162,6 @@ def m3u8_parse_url(url):
 
 
 async def m3u8_video_size(url, http_headers=None):
-    m3u8_data = None
-    m3u8_obj = None
     async with ClientSession(connector=TCPConnector(verify_ssl=False)) as session:
         async with session.get(url, headers=http_headers) as resp:
             m3u8_data = await resp.read()

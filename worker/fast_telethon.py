@@ -6,11 +6,10 @@ import asyncio
 import hashlib
 import inspect
 import logging
-import os
+import math
 from collections import defaultdict
 from typing import Optional, List, AsyncGenerator, Union, Awaitable, DefaultDict, Tuple, BinaryIO
 
-import math
 from telethon import utils, helpers, TelegramClient
 from telethon.crypto import AuthKey
 from telethon.network import MTProtoSender
@@ -252,15 +251,15 @@ async def _internal_transfer_to_telegram(client: TelegramClient,
     part_index = 0
     async for data in stream_file(response, chunk_size=part_size):
         part_index += 1
-        if data == b'':
+        if len(data) == 0:
             part_index -= 1
             break
-        if len(data) != part_size and part_index != part_count:
-            dat = b'\0' * (part_size - len(data))
-            data += dat
+        # if len(data) != part_size and part_index != part_count:
+        #     dat = b'\0' * (part_size - len(data))
+        #     data += dat
         if not is_large:
             hash_md5.update(data)
-        if len(buffer) == 0 and len(data) == part_size:
+        if len(buffer) == 0:
             await uploader.upload(data)
             if part_index >= part_count:
                 break
@@ -281,7 +280,9 @@ async def _internal_transfer_to_telegram(client: TelegramClient,
         else:
             continue
 
-    uploader.senders[0].request.file_total_parts = part_index
+    for u in uploader.senders:
+        u.request.file_total_parts = part_index
+        u.part_count = part_index
     part_count = part_index
 
     if len(buffer) > 0:
@@ -294,10 +295,10 @@ async def _internal_transfer_to_telegram(client: TelegramClient,
 
 
 async def download_file(client: TelegramClient,
-                                        location: TypeLocation,
-                                        out: BinaryIO,
-                                        progress_callback: callable = None
-                                        ) -> BinaryIO:
+                        location: TypeLocation,
+                        out: BinaryIO,
+                        progress_callback: callable = None
+                        ) -> BinaryIO:
     size = location.size
     dc_id, location = utils.get_input_location(location)
     # We lock the transfers because telegram has connection count limits
@@ -314,11 +315,12 @@ async def download_file(client: TelegramClient,
 
 
 async def upload_file(client: TelegramClient,
-                                        file: BinaryIO,
-                                        file_size,
-                                        file_name,
-                                        progress_callback: callable = None,
-                                        max_connection=None
-                                        ) -> TypeInputFile:
-    res = (await _internal_transfer_to_telegram(client, file, file_size, file_name, progress_callback, max_connection=max_connection))[0]
+                      file: BinaryIO,
+                      file_size,
+                      file_name,
+                      progress_callback: callable = None,
+                      max_connection=None
+                      ) -> TypeInputFile:
+    res = (await _internal_transfer_to_telegram(client, file, file_size, file_name, progress_callback,
+                                                max_connection=max_connection))[0]
     return res

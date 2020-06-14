@@ -5,13 +5,14 @@ from datetime import datetime
 
 def parse_time(msg):
     time_re = re.compile(
-        ' ((2[0-3]|[01]?[0-9]):)?(([0-5]?[0-9]):)?([0-5]?[0-9])(-((2[0-3]|[01]?[0-9]):)?(([0-5]?[0-9]):)?([0-5]?[0-9]))? ')
+        '((2[0-3]|[01]?[0-9]):)?(([0-5]?[0-9]):)?([0-5]?[0-9])(-((2[0-3]|[01]?[0-9]):)?(([0-5]?[0-9]):)?([0-5]?['
+        '0-9]))? ')
     time_match = time_re.search(msg)
     if time_match is None:
         raise Exception('Wrong time format')
     time_match = time_match.group()
 
-    cut_time_start = cut_time_end = None
+    cut_time_end = None
     if '-' in time_match:
         cut_time_start, cut_time_end = time_match.split('-')
     else:

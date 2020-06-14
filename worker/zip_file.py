@@ -1,15 +1,14 @@
-
-import asyncio
 import math as m
 import time
 import typing
+from abc import ABC
 
 import zipstream
 
-TG_MAX_FILE_SIZE = 1500*1024*1024
+TG_MAX_FILE_SIZE = 1500 * 1024 * 1024
 
 
-class Reader(typing.BinaryIO):
+class Reader(typing.BinaryIO, ABC):
     def write(self, s: typing.Union[bytes, bytearray]) -> int:
         pass
 
@@ -70,7 +69,8 @@ class Reader(typing.BinaryIO):
     def __exit__(self, type, value, traceback) -> None:
         pass
 
-class ZipTorrentContentFile(Reader):
+
+class ZipTorrentContentFile(Reader, ABC):
     def __init__(self, file_iter, name, size):
         self.buf = bytes()
         self.processed_size = 0
@@ -79,10 +79,11 @@ class ZipTorrentContentFile(Reader):
         file_names_sum = 0
         self.zipstream = zipstream.ZipFile(mode='w', compression=zipstream.ZIP_STORED, allowZip64=True)
         self.zipstream.write_iter(name, file_iter)
-        self.files_size_sum += size if size != 0 else 20 * 1024 * 1024 * 1024
+        self.files_size_sum += size if size != 0 else 100 * 1024 * 1024 * 1024
         file_names_sum += len(name.encode('utf'))
 
-        #self.real_size = 21438417 + 205 + 6 #len(files) * (30 + 16 + 46) + 2 * file_names_sum + files_size_sum + 22 + 512
+        # self.real_size = 21438417 + 205 + 6 #len(files) * (30 + 16 + 46) + 2 * file_names_sum + files_size_sum + 22
+        # + 512
         self.real_size = (30 + 16 + 46) + 2 * file_names_sum + self.files_size_sum + 22 + 5120
 
         self.big = self.real_size > TG_MAX_FILE_SIZE
@@ -92,7 +93,7 @@ class ZipTorrentContentFile(Reader):
         f_name = ''
         for i in name:
             if not i.isalnum():
-                f_name += '_' if last_repl == False else ''
+                f_name += '_' if last_repl is False else ''
                 last_repl = True
             else:
                 f_name += i
@@ -105,10 +106,9 @@ class ZipTorrentContentFile(Reader):
         self.downloaded_bytes_count = 0
         self.last_percent = -1
         self.should_close = False
-        self.zipiter = iter(self.zipstream)
+        self.zipiter = self.zipstream.__aiter__()
         self.is_finished = False
         self.last_progress_update = time.time()
-
 
     @property
     def size(self):
@@ -172,7 +172,7 @@ class ZipTorrentContentFile(Reader):
             self.must_next_file = False
             raise StopAsyncIteration
 
-        data = await self.read(512*1024)
+        data = await self.read(512 * 1024)
         if len(data) == 0 or self.processed_size == 0:
             raise StopAsyncIteration
         return data
@@ -180,7 +180,7 @@ class ZipTorrentContentFile(Reader):
     @property
     def name(self):
         if self.big:
-            return self._name[:20]+'.zip'+'.{:03d}'.format(self.zip_num)
+            return self._name[:20] + '.zip' + '.{:03d}'.format(self.zip_num)
         else:
             return self._name + '.zip'
 
@@ -196,87 +196,43 @@ class ZipTorrentContentFile(Reader):
         elif n + self.processed_size > self.size:
             n = self.size - self.processed_size
 
-        while len(resp) < n and self.processed_size < TG_MAX_FILE_SIZE:
-            try:
-                data = await next_zip_piece(self.zipiter)
-                if data is None:
-                    break
-                resp += data
+        async for data in self.zipiter:
+            if data is None:
+                break
+            resp += data
+            if not (len(resp) < n and self.processed_size < TG_MAX_FILE_SIZE):
+                break
 
-                #if time.time() - self.last_progress_update > 2:
+                # if time.time() - self.last_progress_update > 2:
                 #    await self.event.edit(self.progress_text.format(str(m.floor((self.downloaded_bytes_count*100) / self.size))))
                 #    self.last_progress_update = time.time()
-                #resp += await self.zipstream.__aiter__().__next__()
-                #if len(resp) == 0 and self.should_close == False:
+                # resp += await self.zipstream.__aiter__().__next__()
+                # if len(resp) == 0 and self.should_close == False:
                 #    print("\nSHOULD CLOSE CALL\n")
                 #    self.zipiter = iter(self.zipstream)
                 #    self.should_close = True
                 #    continue
-            except Exception as e:
-                #self.is_finished = True
-                resp += b'\0' * (self.real_size - self.processed_size - len(resp))
-                self.processed_size += len(resp)
-
-                return resp
-
-            if len(resp) > n:
-                self.buf = resp[n:]
-                resp = resp[0:n]
-
+        if len(resp) > n:
+            self.buf = resp[n:]
+            resp = resp[0:n]
 
         if len(resp) != 0 and n == 0:
             # send last piece
             self.processed_size += len(resp)
             return resp
 
-        if len(resp) > n:
-            self.buf = resp[n:]
-            resp = resp[0:n]
-
         self.processed_size += len(resp)
 
         if self.processed_size >= TG_MAX_FILE_SIZE:
-            #if self.is_finished == False and self.real_size - TG_MAX_FILE_SIZE <= 0:
+            # if self.is_finished == False and self.real_size - TG_MAX_FILE_SIZE <= 0:
             #    self.real_size += 1024
             #    TG_MAX_FILE_SIZE = TG_MAX_FILE_SIZE if self.should_split else self.real_size
             #    self.big = self.real_size > TG_MAX_FILE_SIZE
             #    self.size = TG_MAX_FILE_SIZE if self.big else self.real_size
-            #else:
+            # else:
             self.processed_size = 0
             self.must_next_file = True
-            #self.real_size -= TG_MAX_FILE_SIZE
+            # self.real_size -= TG_MAX_FILE_SIZE
             # self._size = TG_MAX_FILE_SIZE if self.real_size > TG_MAX_FILE_SIZE else self.real_size
 
-        if n <= 1024 and n > 0:
-            resp += b'\0'*(n-len(resp))
-            self.processed_size += len(resp)
-
-        self.downloaded_bytes_count += len(resp)
-        if self.real_size != 0:
-            perc = m.floor((self.downloaded_bytes_count*100) / self.real_size)
-            if perc != self.last_percent:
-                try:
-                    self.last_percent = perc
-                    # await self.event.edit(self.progress_text.format(perc), buttons=[Button.inline('Cancel', str(self.event.sender_id))])
-                except Exception as e:
-                    print(e)
-
         return resp
-
-
-
-def _next_zip_piece(zipstream):
-    r = None
-    try:
-        r = next(zipstream)
-    except StopIteration as e:
-        print(e)
-
-    return r
-
-@asyncio.coroutine
-def next_zip_piece(zipstream):
-    # piece = yield from client.loop.run_in_executor(None, _next_zip_piece, zipstream)
-    piece = yield from asyncio.get_event_loop().run_in_executor(None, _next_zip_piece, zipstream)
-
-    return piece

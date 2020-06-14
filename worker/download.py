@@ -11,21 +11,16 @@ from urllib.parse import urlparse, urlunparse
 import aiofiles
 import youtube_dl
 from aiogram import Bot
-from telethon.errors import AuthKeyDuplicatedError
+from telethon.errors import AuthKeyDuplicatedError, BadRequestError
 from telethon.tl.types import (DocumentAttributeAudio,
                                DocumentAttributeFilename,
                                DocumentAttributeVideo)
 from urlextract import URLExtract
 
-import worker.av_source as av_source
-import worker.av_utils as av_utils
-import worker.cut_time as cut_time
-import worker.fast_telethon as fast_telethon
-import worker.tgaction as tgaction
-import worker.thumb as thumb
+from worker import av_source, av_utils, cut_time, fast_telethon, tgaction, thumb, zip_file
 
-TOKEN = os.environ["TOKEN"]
-# TOKEN = "1167018060:AAFtkT-TDr3lq-5ShAL0lj5gr0hFwlE7yas"
+# TOKEN = os.environ["TOKEN"]
+TOKEN = "1167018060:AAFtkT-TDr3lq-5ShAL0lj5gr0hFwlE7yas"
 _bot = Bot(TOKEN)
 
 url_extractor = URLExtract()
@@ -80,30 +75,38 @@ def youtube_to_invidio(url, audio=False):
     return u
 
 
-# async def upload_multipart_zip(client, url, http_headers, name, file_size, chat_id, msg_id):
-#     source = av_source.URLavSync.create(url, http_headers)
-#     zfile = zip_file.ZipTorrentContentFile(source, name, file_size)
+async def upload_multipart_zip(client, source, name, file_size, chat_id, log):
+    zfile = zip_file.ZipTorrentContentFile(source, name, file_size)
 
-#     async def upload_torrent_content(file, chat_id, msg_id):
-#         global TG_CONNECTIONS_COUNT
-#         global TG_MAX_PARALLEL_CONNECTIONS
-#         if 20 > TG_CONNECTIONS_COUNT and file.size > 50 * 1024 * 1024:
-#             TG_CONNECTIONS_COUNT += 3
-#             try:
-#                 uploaded_file = await fast_telethon.upload_file(client,
-#                                                                 file,
-#                                                                 file_size=file.size,
-#                                                                 file_name=file.name,
-#                                                                 max_connection=3)
-#             finally:
-#                 TG_CONNECTIONS_COUNT -= 3
-#         else:
-#             uploaded_file = await client.upload_file(file, file_size=file.size, file_name=file.name)
-#         await client.send_file(chat_id, uploaded_file)
+    async def upload_torrent_content(file):
+        global TG_CONNECTIONS_COUNT
+        global TG_MAX_PARALLEL_CONNECTIONS
+        if 20 > TG_CONNECTIONS_COUNT and file.size > 100 * 1024 * 1024:
+            TG_CONNECTIONS_COUNT += 2
+            try:
+                uploaded_file = await fast_telethon.upload_file(client,
+                                                                file,
+                                                                file_size=file.size,
+                                                                file_name=file.name,
+                                                                max_connection=2)
+            finally:
+                TG_CONNECTIONS_COUNT -= 2
+        else:
+            uploaded_file = await client.upload_file(file, file_size=file.size, file_name=file.name)
+        await client.send_file(chat_id, uploaded_file, caption=str(chat_id))
 
-#     for _ in range(0, zfile.zip_parts):
-#         await upload_torrent_content(zfile, chat_id, msg_id)
-#         zfile.zip_num += 1
+    try:
+        for i in range(0, zfile.zip_parts):
+            await upload_torrent_content(zfile)
+            zfile.zip_num += 1
+    except BadRequestError as e:
+        log.error(e)
+
+    if source is not None:
+        if inspect.iscoroutinefunction(source.close):
+            await source.close()
+        else:
+            source.close()
 
 
 async def send_files(client, chat_id, message, cmd, log):
@@ -117,12 +120,14 @@ async def send_files(client, chat_id, message, cmd, log):
 
     playlist_start = None
     playlist_end = None
+    audio_mode = False
 
     # check cmd and choose video format    
     cut_time_start = cut_time_end = None
 
     if cmd == 'a':
         preferred_formats = [audio_format]
+        audio_mode = True
     else:
         preferred_formats = [vid_hd_format, vid_nhd_format]
 
@@ -130,16 +135,15 @@ async def send_files(client, chat_id, message, cmd, log):
         urls = set(urls)
         for iu, u in enumerate(urls):
             vinfo = None
-            params = {'noplaylist': True,
-                      'youtube_include_dash_manifest': False,
+            params = {'youtube_include_dash_manifest': False,
                       'quiet': True,
                       'no_color': True,
-                      'nocheckcertificate': True,
-                      'ignoreerrors': True
+                      'nocheckcertificate': True
                       # 'force_generic_extractor': True if 'invidio.us/watch' in u else False
                       }
 
-            if playlist_start != None and playlist_end != None:  # and 'invidio.us/watch' not in u:
+            if playlist_start is not None and playlist_end is not None:  # and 'invidio.us/watch' not in u:
+                params['ignoreerrors'] = True
                 if playlist_start == 0 and playlist_end == 0:
                     params['playliststart'] = 1
                     params['playlistend'] = 10
@@ -169,7 +173,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                     1].file.code == 429) or \
                                         'video available in your country' in str(e) or \
                                         'youtube age limit' == str(e):
-                                    invid_url = youtube_to_invidio(u, cmd == 'a')
+                                    invid_url = youtube_to_invidio(u, audio_mode)
                                     if invid_url:
                                         u = invid_url
                                         ydl.params['force_generic_extractor'] = True
@@ -231,6 +235,15 @@ async def send_files(client, chat_id, message, cmd, log):
                     entries = [vinfo]
 
                 for ie, entry in enumerate(entries):
+                    if entry is None:
+                        try:
+                            await client.send_message(chat_id,
+                                                      f"ATTENTION: #{params['playliststart'] + ie} a été ignoré en "
+                                                      f"raison d'une erreur")
+                        except:
+                            pass
+                        continue
+
                     formats = entry.get('requested_formats')
                     _file_size = None
                     chosen_format = None
@@ -278,10 +291,9 @@ async def send_files(client, chat_id, message, cmd, log):
                                 # Dash video
                                 if f['protocol'] == 'https' and \
                                         (True if ('acodec' in f and (
-                                                f['acodec'] == 'none' or f['acodec'] == None)) else False):
+                                                f['acodec'] == 'none' or f['acodec'] is None)) else False):
                                     vformat = f
                                     mformat = None
-                                    vsize = 0
 
                                     direct_url = vformat['url']
                                     if 'invidio.us' in direct_url:
@@ -314,7 +326,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                         file_name = None
                                         if not cut_time_start and STORAGE_SIZE > _file_size > 0:
                                             STORAGE_SIZE -= _file_size
-                                            _ext = 'mp4' if cmd != 'a' else 'mp3'
+                                            _ext = 'mp4' if audio_mode is False else 'mp3'
                                             file_name = entry['title'] + '.' + _ext
                                         ffmpeg_av = await av_source.FFMpegAV.create(vformat,
                                                                                     mformat,
@@ -338,7 +350,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                                 msize = await av_utils.media_size(mformat['url'],
                                                                                   http_headers=http_headers)
                                             msize += 10 * 1024 * 1024
-                                            if (msize + _file_size) > TG_MAX_FILE_SIZE:
+                                            if (msize + _file_size) > TG_MAX_FILE_SIZE and cut_time_start is None:
                                                 mformat = None
                                             else:
                                                 _file_size += msize
@@ -346,11 +358,11 @@ async def send_files(client, chat_id, message, cmd, log):
                                     file_name = None
                                     if not cut_time_start and STORAGE_SIZE > _file_size > 0:
                                         STORAGE_SIZE -= _file_size
-                                        _ext = 'mp4' if cmd != 'a' else 'mp3'
+                                        _ext = 'mp4' if audio_mode is False else 'mp3'
                                         file_name = entry['title'] + '.' + _ext
                                     ffmpeg_av = await av_source.FFMpegAV.create(chosen_format,
                                                                                 aformat=mformat,
-                                                                                audio_only=True if cmd == 'a' else False,
+                                                                                audio_only=True if audio_mode else False,
                                                                                 headers=http_headers,
                                                                                 cut_time_range=_cut_time,
                                                                                 file_name=file_name)
@@ -363,7 +375,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                     if 'invidio.us' in direct_url:
                                         chosen_format['url'] = normalize_url_path(direct_url)
 
-                                    if cmd == 'a' and not (chosen_format['ext'] == 'mp3'):
+                                    if audio_mode and not (chosen_format['ext'] == 'mp3'):
                                         ffmpeg_av = await av_source.FFMpegAV.create(chosen_format,
                                                                                     audio_only=True,
                                                                                     headers=http_headers,
@@ -376,7 +388,8 @@ async def send_files(client, chat_id, message, cmd, log):
                                 recover_playlist_index = ie
                                 break
                             if 'm3u8' in entry['protocol']:
-                                if cut_time_start is None and entry.get('is_live', False) is False and cmd != 'a':
+                                if cut_time_start is None and entry.get('is_live',
+                                                                        False) is False and audio_mode is False:
                                     _file_size = await av_utils.m3u8_video_size(entry['url'], http_headers=http_headers)
                                 else:
                                     # we don't know real size
@@ -401,11 +414,11 @@ async def send_files(client, chat_id, message, cmd, log):
                                 file_name = None
                                 if not cut_time_start and STORAGE_SIZE > _file_size > 0:
                                     STORAGE_SIZE -= _file_size
-                                    _ext = 'mp4' if cmd != 'a' else 'mp3'
+                                    _ext = 'mp4' if audio_mode is False else 'mp3'
                                     file_name = entry['title'] + '.' + _ext
 
                                 ffmpeg_av = await av_source.FFMpegAV.create(chosen_format,
-                                                                            audio_only=True if cmd == 'a' else False,
+                                                                            audio_only=True if audio_mode else False,
                                                                             headers=http_headers,
                                                                             cut_time_range=_cut_time,
                                                                             file_name=file_name)
@@ -414,7 +427,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                 direct_url = chosen_format['url']
                                 if 'invidio.us' in direct_url:
                                     chosen_format['url'] = normalize_url_path(direct_url)
-                                if cmd == 'a' and not (chosen_format['ext'] == 'mp3'):
+                                if audio_mode and not (chosen_format['ext'] == 'mp3'):
                                     ffmpeg_av = await av_source.FFMpegAV.create(chosen_format,
                                                                                 audio_only=True,
                                                                                 headers=http_headers,
@@ -425,17 +438,23 @@ async def send_files(client, chat_id, message, cmd, log):
                                 if _file_size > TG_MAX_FILE_SIZE:
                                     log.info(f"Fichier trop volumineux {file_size}")
 
-                                    # if 'http' in entry.get('protocol', '') and 'unknown' in entry.get('format', '') and entry.get('ext', '') not in ['unknown_video', 'mp3', 'mp4', 'm4a', 'ogg', 'mkv', 'flv', 'avi', 'webm']:
+                                    if 'http' in entry.get('protocol', '') and 'unknown' in entry.get('format',
+                                                                                                      '') and entry.get(
+                                        'ext', '') not in ['unknown_video', 'mp3', 'mp4', 'm4a', 'ogg', 'mkv',
+                                                           'flv', 'avi', 'webm']:
 
-                                    #     await upload_multipart_zip(client, entry.get('url'), http_headers, entry['title']+'.'+entry['ext'], _file_size, chat_id, msg_id)
-                                    # else:
-                                    await client.send_message(chat_id,
-                                                              f"ERREUR: Taille de fichier multimédia trop grande **{sizeof_fmt(file_size)}**\nTelegram autorise les fichiers moins de **1.5GB**")
+                                        source = await av_source.URLav.create(entry.get('url'), http_headers)
+                                        await upload_multipart_zip(client, source, f"{entry['title']}.{entry['ext']}",
+                                                                   _file_size, chat_id, log)
+                                    else:
+                                        await client.send_message(chat_id,
+                                                                  f"ERREUR: Taille de fichier multimédia trop grande **{sizeof_fmt(file_size)}**\nTelegram autorise les fichiers moins de **1.5GB**")
 
                                 else:
                                     log.info('Echec de la recherche du format de support approprié')
                                     await client.send_message(chat_id,
-                                                              "ERREUR: Echec de la recherche du format de support approprié")
+                                                              "ERREUR: Echec de la recherche du format de support "
+                                                              "approprié")
                                 return
 
                             recover_playlist_index = ie
@@ -446,7 +465,7 @@ async def send_files(client, chat_id, message, cmd, log):
                         #                                entry['title'] + '.' + entry['ext'], _file_size, chat_id,
                         #                                msg_id)
                         #     return
-                        if cmd == 'a' and _file_size != 0 and (ffmpeg_av is None or ffmpeg_av.file_name is None):
+                        if audio_mode and _file_size != 0 and (ffmpeg_av is None or ffmpeg_av.file_name is None):
                             # we don't know real size due to converting formats
                             # so increase it in case of real size is less large then estimated
                             _file_size += 10 * 1024 * 1024  # 10MB
@@ -456,11 +475,11 @@ async def send_files(client, chat_id, message, cmd, log):
                                                   "Votre fichier est en cours de telechargement. Patientez quelque "
                                                   "seconde.")
 
-                        width = height = duration = video_codec = audio_codec = None
+                        width = height = video_codec = audio_codec = None
                         title = performer = None
                         format_name = ''
 
-                        if cmd == 'a':
+                        if audio_mode:
                             if entry.get('duration') is None and chosen_format.get('duration') is None:
                                 info = await av_utils.av_info(chosen_format['url'], http_headers=http_headers)
                                 duration = int(float(info['format'].get('duration', 0)))
@@ -482,7 +501,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                     elif s.get('codec_type') == 'audio':
                                         audio_codec = s['codec_name']
                                 if video_codec is None:
-                                    cmd = 'a'
+                                    audio_mode = True
                                 _av_format = info['format']
                                 duration = int(float(_av_format.get('duration', 0)))
                                 format_name = _av_format.get('format_name', '').split(',')[0]
@@ -490,9 +509,11 @@ async def send_files(client, chat_id, message, cmd, log):
                                 if av_tags is not None and len(av_tags.keys()) > 0:
                                     title = av_tags.get('title')
                                     performer = av_tags.get('artist')
+                                    if performer is None:
+                                        performer = av_tags.get('album')
                                 _av_ext = chosen_format.get('ext', '')
                                 if _av_ext == 'mp3' or _av_ext == 'm4a' or _av_ext == 'ogg' or format_name == 'mp3' or format_name == 'ogg':
-                                    cmd = 'a'
+                                    audio_mode = True
                             except KeyError:
                                 width = 0
                                 height = 0
@@ -503,8 +524,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                                       int(chosen_format[
                                                               'duration']) if 'duration' not in entry else int(
                                                           entry['duration'])
-                        if 'm3u8' in chosen_format.get('protocol',
-                                                       '') and duration == 0 and ffmpeg_av is not None and cut_time_start is None:
+                        if 'm3u8' in chosen_format.get('protocol', '') and duration == 0 and ffmpeg_av is not None and cut_time_start is None:
                             cut_time_start, cut_time_end = (time(hour=0, minute=0, second=0),
                                                             time(hour=1, minute=0, second=0))
                             _cut_time = (cut_time_start, cut_time_end)
@@ -531,7 +551,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                         chosen_format['ext'] = 'bin'
                                     else:
                                         if format_name == 'mov':
-                                            if cmd == 'a':
+                                            if audio_mode:
                                                 format_name = 'm4a'
                                             else:
                                                 format_name = 'mp4'
@@ -547,12 +567,12 @@ async def send_files(client, chat_id, message, cmd, log):
                             if not entry.get('is_live') and duration > 1:
                                 if cut_time.time_to_seconds(cut_time_start) > duration:
                                     await client.send_message(chat_id,
-                                                              f"ERROR: L'heure de début est plus longue que la durée du fichier {timedelta(seconds=duration)}")
+                                                              f"ERROR: L'heure de début est plus longue que la durée du fichier **{timedelta(seconds=duration)}**")
                                     return
                                 elif cut_time_end is not None and (
                                         cut_time.time_to_seconds(cut_time_end) > duration != 0):
                                     await client.send_message(chat_id,
-                                                              f"ERROR: L'heure de fin est plus longue que la durée du fichier {timedelta(seconds=duration)}")
+                                                              f"ERROR: L'heure de fin est plus longue que la durée du fichier **{timedelta(seconds=duration)}**")
                                     return
 
                             if cut_time_end is None:
@@ -563,14 +583,14 @@ async def send_files(client, chat_id, message, cmd, log):
                                 duration = abs(
                                     cut_time.time_to_seconds(cut_time_end) - cut_time.time_to_seconds(cut_time_start))
 
-                        if (cut_time_start is not None or (cmd == 'a' and (
+                        if (cut_time_start is not None or (audio_mode and (
                                 chosen_format.get('ext') not in ['mp3', 'm4a', 'ogg']))) and ffmpeg_av is None:
                             ext = chosen_format.get('ext')
                             ffmpeg_av = await av_source.FFMpegAV.create(chosen_format,
                                                                         headers=http_headers,
                                                                         cut_time_range=_cut_time,
                                                                         ext=ext,
-                                                                        audio_only=True if cmd == 'a' else False,
+                                                                        audio_only=True if audio_mode else False,
                                                                         format_name=format_name if ext != 'mp4' and format_name != '' else '')
 
                         if cmd == 'm' and chosen_format.get('ext') != 'mp4' and ffmpeg_av is None and (
@@ -641,6 +661,11 @@ async def send_files(client, chat_id, message, cmd, log):
                             await client.send_message(chat_id, 'ERREUR INTERNE: réessayez')
                             log.fatal(e)
                             os.abort()
+                        except ConnectionError as e:
+                            if 'Cannot send requests while disconnected' in str(e):
+                                await client.connect()
+                                continue
+                            raise
                         finally:
                             if ffmpeg_av and ffmpeg_av.file_name:
                                 STORAGE_SIZE += file_size
@@ -664,8 +689,7 @@ async def send_files(client, chat_id, message, cmd, log):
                                 else:
                                     upload_file.close()
 
-                        attributes = None
-                        if cmd == 'a':
+                        if audio_mode:
                             if performer is None:
                                 performer = entry['artist'] if ('artist' in entry) and \
                                                                (entry['artist'] is not None) else None
@@ -682,13 +706,13 @@ async def send_files(client, chat_id, message, cmd, log):
                         else:
                             attributes = DocumentAttributeFilename(file_name)
                         force_document = False
-                        if ext != 'mp4' and cmd != 'a':
+                        if ext != 'mp4' and audio_mode is False:
                             force_document = True
 
                         log.debug('Envoie du fichier.')
 
-                        video_note = False if cmd == 'a' or force_document else True
-                        voice_note = True if cmd == 'a' else False
+                        video_note = False if audio_mode or force_document else True
+                        voice_note = True if audio_mode else False
                         attributes = ((attributes,) if not force_document else None)
                         caption = entry['title']
                         recover_playlist_index = None

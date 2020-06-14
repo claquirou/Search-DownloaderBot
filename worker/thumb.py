@@ -1,4 +1,3 @@
-
 import io
 from datetime import timedelta
 from math import floor
@@ -6,12 +5,11 @@ from math import floor
 from aiohttp import ClientSession, TCPConnector
 from PIL import Image
 
-import worker.av_utils as av_utils
-import worker.cut_time as cut_time
+from worker import av_source, av_utils
 
 
 async def get_thumbnail(thumb_url, entry):
-    img_data = None
+
     if thumb_url is None or thumb_url == 'none':
         img_data = await get_image_from_video(entry['url'], entry['http_headers'])
     else:
@@ -38,7 +36,6 @@ def resize_thumb(thumb):
 
     width, height = image.size
 
-    n_width = n_height = None
     if width > height:
         n_width = 320
         n_height = floor(n_width / (width / height))
@@ -64,4 +61,3 @@ async def get_image_from_video(url, headers=None):
         duration = 5
     time = timedelta(seconds=duration)
     return await av_source.video_screenshot(url, headers, screen_time=time)
-

@@ -3,17 +3,17 @@ import os
 import signal
 import time
 import typing
+from abc import ABC
 from datetime import datetime
 from urllib import request
 
 import ffmpeg
 from aiohttp import ClientSession, ClientTimeout, TCPConnector
 
-import worker.av_utils as av_utils
-import worker.cut_time as cut_time
+from worker import av_utils, cut_time
 
 
-class DumbReader(typing.BinaryIO):
+class DumbReader(typing.BinaryIO, ABC):
     def write(self, s: typing.Union[bytes, bytearray]) -> int:
         pass
 
@@ -75,9 +75,10 @@ class DumbReader(typing.BinaryIO):
         pass
 
 
-class FFMpegAV(DumbReader):
+class FFMpegAV(DumbReader, ABC):
 
     def __init__(self):
+        self.stream = None
         self._buf = b''
         self.file_name = None
 
@@ -134,7 +135,7 @@ class FFMpegAV(DumbReader):
                 if vformat['acodec'].startswith('mp3'):
                     acodec = 'mp3'
 
-                if acodec != None:
+                if acodec is not None:
                     if not ff.file_name:
                         _fstream = _finput.output('pipe:',
                                                   format=acodec,
@@ -210,7 +211,8 @@ class FFMpegAV(DumbReader):
             # if cut_time_start is not None and not audio_only:
             #     args[args.index('-acodec') + 1] = 'copy'  # copy audio if cutting due to music issue
 
-        args = args[:1] + ["-loglevel",  "error", "-icy", "0", "-err_detect", "ignore_err", "-reconnect", "1", "-reconnect_streamed", "1", "-reconnect_delay_max", "10"] + args[1:]
+        args = args[:1] + ["-loglevel", "error", "-icy", "0", "-err_detect", "ignore_err", "-reconnect", "1",
+                           "-reconnect_streamed", "1", "-reconnect_delay_max", "10"] + args[1:]
         if not ff.file_name:
             proc = await asyncio.create_subprocess_exec('ffmpeg',
                                                         *args[1:],
@@ -272,8 +274,10 @@ class FFMpegAV(DumbReader):
             pass
 
 
-class URLav(DumbReader):
+class URLav(DumbReader, ABC):
     def __init__(self):
+        self.session = None
+        self.request = None
         self._buf = b''
 
     @staticmethod
@@ -283,7 +287,6 @@ class URLav(DumbReader):
             await urlav.close()
             urlav = await URLav._create(url)
         return urlav
-
 
     @staticmethod
     async def _create(url, headers=None):
@@ -321,6 +324,7 @@ class URLav(DumbReader):
 
 class URLavSync(DumbReader):
     def __init__(self):
+        self.request = None
         self._buf = b''
 
     @staticmethod
@@ -330,7 +334,6 @@ class URLavSync(DumbReader):
             urlav.close()
             urlav = URLavSync._create(url)
         return urlav
-
 
     @staticmethod
     def _create(url, headers=None):
@@ -380,6 +383,7 @@ async def video_screenshot(url, headers=None, screen_time=None, quality=5):
         image_data = await _video_screenshot(url, screen_time=screen_time, quality=quality)
 
     return image_data
+
 
 async def _video_screenshot(url, headers=None, screen_time=None, quality=5):
     if headers:
