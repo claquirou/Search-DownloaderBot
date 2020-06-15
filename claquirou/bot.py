@@ -43,7 +43,7 @@ async def start(event):
 @client.on(events.NewMessage(pattern="/help"))
 async def helps(event):
     chat_id = event.chat_id
-    new_logger(chat_id).debug("Demande de l'aide")
+    new_logger(chat_id).debug("HELP")
 
     await typing_action(chat_id)
     with open("help.txt", "r") as f:

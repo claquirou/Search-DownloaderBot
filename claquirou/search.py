@@ -51,13 +51,12 @@ class Search:
             return "\n".join(page)
         
     def results(self, query):
-        description = self.get_data(query=query, tag="div", attrs={"class": "SALvLe"})
+        description = self.get_data(query=query, tag="div", attrs={"class": "LMRCfc"})
         synonym = self.get_data(query=query, tag="ol", attrs={"class": "eQJLDd"})
         other_synonym = self.get_data(query=query, tag="div", attrs={"class": "di3YZe"})
-        actor = self.get_data(query=query, tag="div", attrs={"class": "wfg6Pb"})
-        medecine = self.get_data(query=query, tag="div", attrs={"class": "wQu7gc"})
+        actor = self.get_data(query=query, tag="div", attrs={"class": "FozYP"})
         
-        return description or synonym or other_synonym or actor or medecine
+        return description or synonym or other_synonym or actor
 
     def other_result(self, query):
         soup = self._setup_requests(query)
@@ -78,15 +77,16 @@ class Weather(Search):
     def results(self, query):
         soup = self._setup_requests(query, meteo=True)
         
-        region = soup.find(id='wob_loc').text
-        temperature_now = soup.find(id='wob_tm').text
-        date = soup.find(id='wob_dts').text
-        weather_now = soup.find(id='wob_dc').text
-        precipitation = soup.find(id='wob_pp').text
-        humidity = soup.find(id='wob_hm').text
-        wind = soup.find(id='wob_ws').text
-
         try:
+            region = soup.find(id='wob_loc').text
+            temperature_now = soup.find(id='wob_tm').text
+            date = soup.find(id='wob_dts').text
+            weather_now = soup.find(id='wob_dc').text
+            precipitation = soup.find(id='wob_pp').text
+            humidity = soup.find(id='wob_hm').text
+            wind = soup.find(id='wob_ws').text
+
+
             return f"Localisation: {region}\nDate: {date}\nTempérature: {temperature_now}°C\nDescription: {weather_now}\nPrécipitation: {precipitation}\nHumidité: {humidity}\nVent: {wind}"
         
         except AttributeError:
@@ -94,5 +94,5 @@ class Weather(Search):
 
 
 if __name__ == "__main__":
-    a = Search()
-    print(a.results("Bill Gates"))
+    a = Weather()
+    print(a.results("jajajadndn"))
