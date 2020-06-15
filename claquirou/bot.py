@@ -84,24 +84,24 @@ async def button(event):
     if event.data == b"1":
         await event.delete()
         search = Search()
-        await user_conversation(chat_id=chat_id, tips=get_tip("WEB"), search=search)
+        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("WEB"), search=search))
 
     elif event.data == b"2":
         await event.delete()
-        await user_conversation(chat_id=chat_id, tips=get_tip("IMAGE"), search="image")
+        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("IMAGE"), search="image"))
 
     elif event.data == b"3":
         await event.delete()
-        await user_conversation(chat_id=chat_id, tips=get_tip("AUDIO"), cmd="a")
+        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("AUDIO"), cmd="a"))
 
     elif event.data == b"4":
         await event.delete()
-        await user_conversation(chat_id=chat_id, tips=get_tip("VIDEO"), cmd="v")
+        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("VIDEO"), cmd="v"))
 
     elif event.data == b"5":
         await event.delete()
         weather = Weather()
-        await user_conversation(chat_id=chat_id, tips=get_tip("METEO"), search=weather)
+        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip("METEO"), search=weather))
 
     raise events.StopPropagation
 
