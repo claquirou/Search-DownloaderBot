@@ -15,7 +15,7 @@ from claquirou.constant import PARAMS, TIPS_DIR
 
 # config = configparser.ConfigParser()
 # config.read(PARAMS)
-#
+
 # API_ID = config["DEFAULT"]["API_ID"]
 # API_HASH = config["DEFAULT"]["API_HASH"]
 # TOKEN = config["DEFAULT"]["TOKEN"]
@@ -29,8 +29,6 @@ SESSION = os.environ["SESSION"]
 
 client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
 # client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
-
-database = UserBot()
 
 
 def new_logger(user_id):
@@ -53,12 +51,14 @@ def get_tip(tips):
 
 
 async def get_user_id():
+    database = UserBot()
     get_user = await database.select_data
     all_user = [i[0] for i in get_user]
     return all_user
 
 
 async def send_user():
+    database = UserBot()
     get_user = await database.select_data
     users = []
     for i in get_user:
@@ -75,6 +75,7 @@ async def typing_action(chat_id, chat_action="typing", period=3):
 
 
 async def new_user(chat_id, first_name, last_name):
+    database = UserBot()
     all_users = await get_user_id()
 
     if chat_id not in all_users:
@@ -102,6 +103,7 @@ async def user(event):
 
 @client.on(events.NewMessage(pattern="/userCount"))
 async def user_count(event):
+    database = UserBot()
     chat_id = event.chat_id
 
     await typing_action(chat_id)
