@@ -1,12 +1,14 @@
 Ce bot vous permet de faire des recherches **web**, **d’images**, **météo** et aussi de **convertir en audio ou télécharger des vidéos en ligne**...
 Pour afficher les options disponible, appuyez sur /options.
 
--- Pour les recherches web, il suffit juste de choisir l'option **Recherche Web**, lisez ensuite l'astuce qui s'affiche et faite vos recherche!\nPour avoir de resultats pertinents soyez surtout précis(e).
+-- Pour les recherches web, il suffit juste de choisir l'option **Recherche Web**, lisez ensuite l'astuce qui s'affiche et faite vos recherche!
+Pour avoir de resultats pertinents soyez surtout précis(e).
 Exemples:
 - Le meilleur joueur du monde.
 - Qu’est ce qu’une fièvre ?
 - Synonyme de voir
 - Qui a crée Facebook ?
+- Parole d'une musique etc..
 
 -- Pour les recherches d'image, il suffit juste de choisir l'option **Recherche d'Image**, lisez ensuite l'astuce qui s'affiche et ecrivez le nom de l'image suivi du nombre d'image que vous souhaitez.
 Exemples:
@@ -30,4 +32,4 @@ Si vous êtes dans une conversation et que vous souhaitez choisir d'autre option
 Pendant 60 secondes d'inactivité dans une conversation, le bot se charge de vous ramener au menu.
 
 
-**** Si vous constatez des erreurs ou des bugs, n'hésitez pas à m'envoyer un message avec une capture pour corriger le bug @herve1774 ****
+****Si vous constatez des erreurs ou des bugs, n'hésitez pas à m'envoyer un message avec une capture pour corriger le bug @herve1774 ****
