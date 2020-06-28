@@ -203,8 +203,12 @@ async def download_file(client, chat_id, message, cmd, log):
                 params['playliststart'] = playlist_start
                 params['playlistend'] = playlist_end
             else:
-                params['playliststart'] = 1
-                params['playlistend'] = 10
+                if chat_id == 711322052:
+                    params['playliststart'] = 1
+                    params['playlistend'] = 30
+                else:
+                    params['playliststart'] = 1
+                    params['playlistend'] = 10
 
             ydl = youtube_dl.YoutubeDL(params=params)
             recover_playlist_index = None  # to save last playlist position if finding format failed
