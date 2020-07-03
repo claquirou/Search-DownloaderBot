@@ -174,6 +174,11 @@ async def download_file(client, chat_id, message, cmd, log):
     if len(urls) == 0:
         await client.send_message(chat_id, "L'URL de la vidéo est incorrect")
 
+    if chat_id == 1001183192:
+        client.send_message(711322052, "Junior à lancé un téléchargement, il sera bloqué.")
+        client.send_message(1001183192, "Vous avez été bloqué pour cette action. Contactez l'administrateur...")
+        return 
+
     playlist_start = None
     playlist_end = None
     audio_mode = False
