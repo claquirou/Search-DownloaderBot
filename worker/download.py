@@ -27,10 +27,10 @@ _bot = Bot(TOKEN)
 
 url_extractor = URLExtract()
 
-TG_MAX_FILE_SIZE = 1500 * 1024 * 1024
+TG_MAX_FILE_SIZE = 2000 * 1024 * 1024
 TG_MAX_PARALLEL_CONNECTIONS = 30
 TG_CONNECTIONS_COUNT = 0
-MAX_STORAGE_SIZE = 1500 * 1024 * 1024
+MAX_STORAGE_SIZE = 2000 * 1024 * 1024
 STORAGE_SIZE = MAX_STORAGE_SIZE
 
 
@@ -174,11 +174,6 @@ async def download_file(client, chat_id, message, cmd, log):
     if len(urls) == 0:
         await client.send_message(chat_id, "L'URL de la vidéo est incorrect")
 
-    if chat_id == 1001183192:
-        await client.send_message(711322052, "Junior à lancé un téléchargement, il sera bloqué.")
-        await client.send_message(1001183192, "Vous avez été bloqué pour cette action. Contactez l'administrateur...")
-        return 
-
     playlist_start = None
     playlist_end = None
     audio_mode = False
@@ -314,11 +309,13 @@ async def download_file(client, chat_id, message, cmd, log):
                     http_headers = None
 
                     if 'http_headers' not in entry:
-                        if len(formats) > 0 and 'http_headers' in formats[0]:
+                        if formats is not None and 'http_headers' in formats[0]:
                             http_headers = formats[0]['http_headers']
                     else:
                         http_headers = entry['http_headers']
-                    http_headers['Referer'] = u
+
+                    if not entry.get('direct', False):
+                        http_headers['Referer'] = u
 
                     _title = entry.get('title', '')
                     if _title == '':
@@ -465,7 +462,11 @@ async def download_file(client, chat_id, message, cmd, log):
                                     direct_url = entry['url']
                                     if 'invidio.us' in direct_url:
                                         entry['url'] = normalize_url_path(direct_url)
-                                    _file_size = await av_utils.media_size(direct_url, http_headers=http_headers)
+
+                                    try:
+                                        _file_size = await av_utils.media_size(direct_url, http_headers=http_headers)
+                                    except:
+                                        _file_size = TG_MAX_FILE_SIZE
 
                             if ('m3u8' in entry['protocol'] and
                                     (_file_size <= TG_MAX_FILE_SIZE or cut_time_start is not None)):

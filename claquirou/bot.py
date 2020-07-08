@@ -107,8 +107,13 @@ async def button(event):
 
 
 async def user_conversation(chat_id, tips, search=None, cmd=None):
+    if chat_id == 711322052:
+        out = 300
+    else:
+        out = 65
+
     try:
-        async with client.conversation(chat_id, timeout=65) as conv:
+        async with client.conversation(chat_id, timeout=out) as conv:
             msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end** ."
             await conv.send_message(f"{tips} {msg}", parse_mode='md')
 
@@ -158,7 +163,7 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                         continue_conv = False
 
             except asyncio.TimeoutError:
-                await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**")
+                await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**.")
 
     except AlreadyInConversationError:
         await client.send_message(chat_id, get_tip("TIPS"))
@@ -169,12 +174,12 @@ async def media(event):
     if event.file:
         await event.reply(
             "Types de fichiers non pris en charge pour le moment. Ressayez plus tard...\n\nAppuyez sur **/options** "
-            "pour afficher les options",
+            "pour afficher les options.",
             parse_mode="md")
         new_logger(event.chat_id).debug("FILE")
 
     elif event.contact:
-        await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options",
+        await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options.",
                             parse_mode="md")
         new_logger(event.chat_id).debug("CONTACT")
 
