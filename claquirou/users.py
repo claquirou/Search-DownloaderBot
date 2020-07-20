@@ -43,8 +43,7 @@ class UserBot:
     async def select_data(self):
         self.cursor.execute("SELECT identifiant, nom, prenom FROM botuser")
 
-        data = self.cursor.fetchall()
-        return data
+        return self.cursor.fetchall()
 
     async def commit_data(self):
         self.conn.commit()

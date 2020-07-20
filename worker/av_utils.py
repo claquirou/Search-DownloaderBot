@@ -11,11 +11,7 @@ from aiohttp import ClientSession, hdrs, TCPConnector
 
 # convert each key-value to string like "key: value"
 def dict_to_list(_dict):
-    ret = []
-    for k, v in _dict.items():
-        ret.append(k + ": " + v)
-
-    return ret
+    return [k + ": " + v for k, v in _dict.items()]
 
 
 async def av_info(url, http_headers=''):
@@ -146,7 +142,7 @@ async def media_mime(url, http_headers=None):
             _content_type = get_resp.headers.getall(hdrs.CONTENT_TYPE)
             for ct in _content_type:
                 _media_type = ct.split('/')[0]
-                if _media_type == 'audio' or _media_type == 'video':
+                if _media_type in ['audio', 'video']:
                     return ct, None
             else:
                 if len(_content_type) > 0:

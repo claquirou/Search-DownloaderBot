@@ -19,10 +19,7 @@ async def start(event):
     await typing_action(event.chat_id)
 
     now = time.strftime("%H", time.gmtime())
-    if 4 < int(now) < 18:
-        greeting = "Bonjour"
-    else:
-        greeting = "Bonsoir"
+    greeting = "Bonjour" if 4 < int(now) < 18 else "Bonsoir"
 
     if user.id not in all_users:
         start_msg = get_tip("START")
@@ -107,11 +104,8 @@ async def button(event):
 
 
 async def user_conversation(chat_id, tips, search=None, cmd=None):
-    if chat_id == 711322052:
-        out = 300
-    else:
-        out = 65
-
+    out = 300 if chat_id == 711322052 else 65
+    
     try:
         async with client.conversation(chat_id, timeout=out) as conv:
             msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end** ."

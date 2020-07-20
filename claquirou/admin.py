@@ -53,8 +53,7 @@ def get_tip(tips):
 async def get_user_id():
     database = UserBot()
     get_user = await database.select_data
-    all_user = [i[0] for i in get_user]
-    return all_user
+    return [i[0] for i in get_user]
 
 
 async def send_user():

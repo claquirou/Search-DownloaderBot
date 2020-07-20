@@ -26,9 +26,8 @@ def send_images(query):
         else:
             search = "+".join(query)
             url = f"https://www.google.co.in/search?q={search}&source=lnms&tbm=isch"
-            images = initialise_requests(url, number)
-            return images
-    
+            return initialise_requests(url, number)
+
     except ValueError:
         return "Format incorrect !\nVous avez fait une erreur, écrivez le nom de l'image suivi du nombre d'image que " \
                "vous voulez. "

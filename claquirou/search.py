@@ -26,9 +26,8 @@ class Search:
                 response = requests.get(url, headers=http_headers)
             else:
                 response = requests.get(url, {"User-Agent": http_headers})
-        
-        soup = BeautifulSoup(response.text, "html.parser")
-        return soup
+
+        return BeautifulSoup(response.text, "html.parser")
 
     def get_data(self, query, tag, attrs):
         soup = self._setup_requests(query, head=True)

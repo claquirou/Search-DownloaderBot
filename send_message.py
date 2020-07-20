@@ -12,9 +12,9 @@ async def inform_all_user():
     z = 0
 
     for i in get_user:
-        # message = f"Bonsoir {i[1]}.\nNous tenions à vous informer que le bot sera temporairement indisponible jusqu'a 2:00 GMT en raison d’activités de maintenance...\nBonne soirée."
+        # message = f"Hey.\nNous tenions à vous informer que le bot est de nouveau disponible."
 
-        message = f"Bonsoir {i[1]}.\nNous tenons à vous informer que le bot est à nouveau disponible suite à des mises à jour.\nDe nouvelles fonctionnalités sont disponible tel que les téléchargements simultanés d'audios, videos ou des playlists.\nVous pouvez également exécuter plusieurs tâches au même moment, par exemple: *Lancer des téléchargements et en même temps faire des recherches.*\n\nUne nouvelle langue 🇺🇸 sera disponible dans les jours à venir...Vos avis seront les bienvenus *@herve1774*"
+        message = f"Donnez votre avis sur le bot sur https://telegramic.org/bot/claquiroubot/"
 
         try:
             bot.send_message(i[0], message, parse_mode=ParseMode.MARKDOWN)
