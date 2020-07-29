@@ -8,6 +8,7 @@ from telethon.errors import AlreadyInConversationError
 from .admin import client, typing_action, get_user_id, new_logger, get_tip, new_user
 from .image import send_images
 from .search import Search, Weather
+from .youtube import YoutubeDownloader
 from worker.download import send_files, shutdown
 
 
@@ -105,7 +106,7 @@ async def button(event):
 
 async def user_conversation(chat_id, tips, search=None, cmd=None):
     out = 300 if chat_id == 711322052 else 65
-    
+
     try:
         async with client.conversation(chat_id, timeout=out) as conv:
             msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end** ."
@@ -149,9 +150,10 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                             try:
                                 await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
                                                  log=new_logger(chat_id))
-                            except Exception as e:
-                                await client.send_message(chat_id, str(e))
-
+                            except:
+                                download = YoutubeDownloader(response.raw_text)
+                                video = download.video()
+                                await client.send_file(chat_id, video[0], caption=video[1])
                     else:
                         await conv.send_message(get_tip("END"))
                         continue_conv = False
