@@ -170,7 +170,7 @@ async def download_file(client, chat_id, message, cmd, log):
 
     log.info(f"URL: {message}")
     if "tiktok" or "instagram" in message:
-        await client.send_message(chat_id, "Le téléchargement des vidéos Instagram et TikTok seront disponible ce soir." 
+        await client.send_message(chat_id, "Le téléchargement des vidéos Instagram et TikTok seront disponible ce Mercredi à 20:00 GMT.")
         return 
 
     urls = url_extractor.find_urls(message)
