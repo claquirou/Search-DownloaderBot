@@ -32,7 +32,7 @@ async def start(event):
         await event.respond(
             f"{greeting} {user.first_name}.\nPour mettre fin à une conversation appuyez sur **/end** avant de cliquer "
             f"sur "
-            f"**/options** pour choisir d'autre options. Pour avoir de l'aide, appuyez sur **/help**.\n\nNB: Le bot n'est plus maintenue depuis un moment.")
+            f"**/options** pour choisir d'autre options. Pour avoir de l'aide, appuyez sur **/help**.\n\nNB: Le bot n'est plus maintenue depuis un moment et ne serait donc plus mis à jour.")
 
     raise events.StopPropagation
 
@@ -108,7 +108,7 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
     
     try:
         async with client.conversation(chat_id, timeout=out) as conv:
-            msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end**.\n\nNB: Le bot n'est plus maintenue depuis le 18/06/2020"
+            msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end**.\n\nNB: Le bot n'est plus maintenue depuis le 18/06/2020 et ne serait donc plus mis à jour."
             await conv.send_message(f"{tips} {msg}", parse_mode='md')
 
             try:
@@ -150,14 +150,14 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                                 await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
                                                  log=new_logger(chat_id))
                             except Exception as e:
-                                await client.send_message(chat_id, f"Rappel: Le bot n'est plus maintenue depuis le 18/06/2020\n\n{str(e)}")
+                                await client.send_message(chat_id, f"Rappel: Le bot n'est plus maintenue depuis le 18/06/2020 et ne serait donc plus mis à jour.\n\n{str(e)}")
 
                     else:
                         await conv.send_message(get_tip("END"))
                         continue_conv = False
 
             except asyncio.TimeoutError:
-                await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**.")
+                await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**.\n\nNB: Le bot n'est plus maintenue depuis le 18/06/2020 et ne serait donc plus mis à jour.")
 
     except AlreadyInConversationError:
         await client.send_message(chat_id, get_tip("TIPS"))
