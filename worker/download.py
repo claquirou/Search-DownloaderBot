@@ -169,14 +169,11 @@ async def download_file(client, chat_id, message, cmd, log):
     global STORAGE_SIZE
 
     log.info(f"URL: {message}")
-    if "tiktok" or "instagram" in message:
-        await client.send_message(chat_id, "Le téléchargement des vidéos Instagram et TikTok seront disponible ce Mercredi à 20:00 GMT.")
-        return 
-
     urls = url_extractor.find_urls(message)
+
     if len(urls) == 0:
         await client.send_message(chat_id, "L'URL de la vidéo est incorrect")
-        return 
+        return
 
     playlist_start = None
     playlist_end = None
@@ -209,7 +206,7 @@ async def download_file(client, chat_id, message, cmd, log):
             else:
                 if chat_id == 711322052:
                     params['playliststart'] = 1
-                    params['playlistend'] = 30
+                    params['playlistend'] = 100
                 else:
                     params['playliststart'] = 1
                     params['playlistend'] = 10
