@@ -157,7 +157,7 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                         continue_conv = False
 
             except asyncio.TimeoutError:
-                await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**.\n\nNB: Le bot n'est plus maintenue depuis le 18/06/2020 et ne serait donc plus mis à jour.")
+                await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**.\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020 et ne serait donc plus mis à jour.")
 
     except AlreadyInConversationError:
         await client.send_message(chat_id, get_tip("TIPS"))
