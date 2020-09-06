@@ -108,7 +108,7 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
     
     try:
         async with client.conversation(chat_id, timeout=out) as conv:
-            msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end**.\n\nNB: Le bot n'est plus maintenue depuis le 18/06/2020 et ne serait donc plus mis à jour."
+            msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end**.\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020"
             await conv.send_message(f"{tips} {msg}", parse_mode='md')
 
             try:
@@ -150,7 +150,7 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                                 await send_files(client=client, chat_id=chat_id, message=response.raw_text, cmd=cmd,
                                                  log=new_logger(chat_id))
                             except Exception as e:
-                                await client.send_message(chat_id, f"Rappel: Le bot n'est plus maintenue depuis le 18/06/2020 et ne serait donc plus mis à jour.\n\n{str(e)}")
+                                await client.send_message(chat_id, f"Rappel: Le bot n'est plus maintenue depuis le 05/09/2020\n\n{str(e)}")
 
                     else:
                         await conv.send_message(get_tip("END"))

@@ -124,7 +124,7 @@ def youtube_to_invidio(url, audio=False):
         ytb_id_match = get_ytb_id_re.search(url)
         if ytb_id_match:
             ytb_id = ytb_id_match.groups()[-1]
-            u = "https://invidio.us/watch?v=" + ytb_id + "&quality=dash"
+            u = "https://invidious.snopyta.org/watch?v=" + ytb_id + "&quality=dash"
             if audio:
                 u += '&listen=1'
     return u
@@ -196,10 +196,10 @@ async def download_file(client, chat_id, message, cmd, log):
                       'quiet': True,
                       'no_color': True,
                       'nocheckcertificate': True
-                      # 'force_generic_extractor': True if 'invidio.us/watch' in u else False
+                      # 'force_generic_extractor': True if 'invidious.snopyta.org/watch' in u else False
                       }
 
-            if playlist_start is not None and playlist_end is not None:  # and 'invidio.us/watch' not in u:
+            if playlist_start is not None and playlist_end is not None:  # and 'invidious.snopyta.org/watch' not in u:
                 params['ignoreerrors'] = True
                 params['playliststart'] = playlist_start
                 params['playlistend'] = playlist_end
@@ -227,7 +227,7 @@ async def download_file(client, chat_id, message, cmd, log):
                                 if vinfo.get('age_limit') == 18 and is_ytb_link_re.search(vinfo.get('webpage_url', '')):
                                     raise youtube_dl.DownloadError('youtube age limit')
                             except youtube_dl.DownloadError as e:
-                                # try to use invidio.us youtube frontend to bypass 429 block
+                                # try to use invidious.snopyta.org youtube frontend to bypass 429 block
                                 if (e.exc_info is not None and e.exc_info[0] is HTTPError and e.exc_info[
                                     1].file.code == 429) or \
                                         'video available in your country' in str(e) or \
@@ -339,7 +339,7 @@ async def download_file(client, chat_id, message, cmd, log):
                                     else:
                                         try:
                                             direct_url = f['url']
-                                            if 'invidio.us' in direct_url:
+                                            if 'invidious.snopyta.org' in direct_url:
                                                 direct_url = normalize_url_path(direct_url)
                                             _file_size = await av_utils.media_size(direct_url,
                                                                                    http_headers=http_headers)
@@ -357,7 +357,7 @@ async def download_file(client, chat_id, message, cmd, log):
                                     mformat = None
 
                                     direct_url = vformat['url']
-                                    if 'invidio.us' in direct_url:
+                                    if 'invidious.snopyta.org' in direct_url:
                                         vformat['url'] = normalize_url_path(direct_url)
 
                                     if 'filesize' in vformat and vformat['filesize'] != 0 and vformat[
@@ -372,7 +372,7 @@ async def download_file(client, chat_id, message, cmd, log):
                                         mformat = formats[i + 1]
 
                                         direct_url = mformat['url']
-                                        if 'invidio.us' in direct_url:
+                                        if 'invidious.snopyta.org' in direct_url:
                                             mformat['url'] = normalize_url_path(direct_url)
 
                                         if 'filesize' in mformat and mformat['filesize'] != 0 and mformat[
@@ -433,7 +433,7 @@ async def download_file(client, chat_id, message, cmd, log):
                                     chosen_format = f
 
                                     direct_url = chosen_format['url']
-                                    if 'invidio.us' in direct_url:
+                                    if 'invidious.snopyta.org' in direct_url:
                                         chosen_format['url'] = normalize_url_path(direct_url)
 
                                     if audio_mode and not (chosen_format['ext'] == 'mp3'):
@@ -461,7 +461,7 @@ async def download_file(client, chat_id, message, cmd, log):
                                     _file_size = entry['filesize']
                                 else:
                                     direct_url = entry['url']
-                                    if 'invidio.us' in direct_url:
+                                    if 'invidious.snopyta.org' in direct_url:
                                         entry['url'] = normalize_url_path(direct_url)
 
                                     try:
@@ -490,7 +490,7 @@ async def download_file(client, chat_id, message, cmd, log):
                             elif (_file_size <= TG_MAX_FILE_SIZE) or cut_time_start is not None:
                                 chosen_format = entry
                                 direct_url = chosen_format['url']
-                                if 'invidio.us' in direct_url:
+                                if 'invidious.snopyta.org' in direct_url:
                                     chosen_format['url'] = normalize_url_path(direct_url)
                                 if audio_mode and not (chosen_format['ext'] == 'mp3'):
                                     ffmpeg_av = await av_source.FFMpegAV.create(chosen_format,
