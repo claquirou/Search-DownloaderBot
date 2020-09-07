@@ -124,5 +124,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-token.ini
-send_message.py
+
+*token.ini
+*send_message.py
