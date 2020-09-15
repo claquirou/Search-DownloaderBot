@@ -16,7 +16,7 @@ Pillow==7.2.0
 brotlipy==0.7.0
 cchardet==2.1.6
 pycares==3.1.1
-youtube-dl==2020.09.06
+youtube-dl==2020.09.14
 aiodns==2.0.0
 psycopg2==2.8.5
 selenium==3.141.0
