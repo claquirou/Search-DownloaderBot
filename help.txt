@@ -34,4 +34,4 @@ Si vous êtes dans une conversation et que vous souhaitez choisir d'autre option
 Pendant 60 secondes d'inactivité dans une conversation, le bot se charge de vous ramener au menu.
 
 
-** Auteur: @herve1774**
+** Auteur: @herve177**
