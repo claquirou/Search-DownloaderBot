@@ -55,7 +55,7 @@ urlextract==0.14.0
 urllib3==1.25.11
 whichcraft==0.6.1
 yarl==1.6.2
-youtube-dl==2020.12.02
+youtube-dl==2020.12.07
 zipstream-new==1.1.7
 zope.event==4.5.0
 zope.interface==5.2.0
