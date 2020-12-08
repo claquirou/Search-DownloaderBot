@@ -12,7 +12,7 @@ async def inform_all_user():
     z = 0
 
     for i in get_user:
-        message = f"Bonsoir {i[1]}.\nLe bot n'est plus développée ni maintenue depuis un certain moment et ne le sera plus. Ce qui provoque déjà des erreurs etc... A bientôt"
+        message = f"🤖🦾"
 
         try:
             bot.send_message(i[0], message, parse_mode=ParseMode.MARKDOWN)

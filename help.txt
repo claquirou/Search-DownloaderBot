@@ -1,4 +1,4 @@
-**BOT NON MAINTENUE DEPUIS LE 18/06/2020.** 
+**BOT NON MAINTENUE DEPUIS LE 18/06/2020**. 
 
 Ce bot vous permet de faire des recherches **web**, **d’images**, **météo** et aussi de **convertir en audio ou télécharger des vidéos en ligne**...
 Pour afficher les options disponible, appuyez sur /options.
