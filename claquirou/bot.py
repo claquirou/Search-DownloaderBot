@@ -60,8 +60,8 @@ async def option(event):
         [Button.inline("Recherche Web🌍", b"1"),
          Button.inline("Recherche d'Image📸", b"2")],
 
-        [Button.inline("Audio🎧", b"3"),
-         Button.inline("Vidéos🎥", b"4")],
+        [Button.inline("Download Audio🎧", b"3"),
+         Button.inline("Download Vidéos🎥", b"4")],
 
         [Button.inline("Données Métérologiques🌦", b"5")]
     ]
