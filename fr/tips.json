@@ -1,0 +1,23 @@
+{
+    "START": "Nous sommes heureux de vous compter parmi nos utilisateurs😉. Appuyez sur **/options** pour afficher les options.\nPour savoir comment le bot fonctionne, appuyez sur **/help** (**À lire avant de commencer**).\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020",
+
+    "WEB": "Astuce:\n**Pour faire des recherches Web🌍, c'est tout simple, faite comme si vous etiez sur Google** 😃\nSi vous constatez des erreurs, ne vous inquiété pas les recherches web seront bientôt amélioré.",
+
+    "IMAGE": "Astuce:\n**Pour faire des recherches d'Images, écrivez le nom de l'image suivi du nombre d'image📸 que vous voulez.**\nNB: Le nombre d'image doit être **inférieur ou égal à 15**.",
+    
+    "AUDIO": "Astuce:\n**Pour avoir l'audio d'une vidéo Facebook, Youtube etc... ([liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)) il vous suffit juste de coller le 🔗lien de la vidéo** 😉",
+    
+    "VIDEO": "Astuce:\n**Pour télécharger une vidéo Facebook, Instagram, Youtube etc... ([liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)), il vous suffit juste de coller le 🔗lien de la vidéo** 😉",
+    
+    "METEO": "Astuce:\n**Pour avoir la météo⛈ d'une ville, écrivez juste le nom de la ville🗺**.\n__C'est cool non__🤗",
+    
+    "END": "Merci d'avoir utilisé notre service 😉.\nPour afficher les options, appuyez sur **/options**\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020.",
+
+    "TIPS": "Vous êtes déjà dans une conversation, pour y mettre fin appuyez sur **/end** avant de pouvoir choisir d'autre options. Pour avoir de l'aide appuyez sur **/help.**",
+
+    "OTHER": "Pour mettre fin à une conversation appuyez sur **/end** avant de cliquer sur **/options** pour choisir d'autre options. Pour avoir de l'aide, appuyez sur **/help**.",
+
+    "END_CONV": "Pour mettre fin à la conversation et choisir une autre option, appuyez sur **/end**.\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020.",
+
+    "TIMEOUT": "Conversation terminée!\n\nPour afficher les options appuyez sur **/options**.\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020."
+}

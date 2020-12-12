@@ -5,9 +5,9 @@ import asyncio
 from telethon import Button, events
 from telethon.errors import AlreadyInConversationError
 
-from .admin import client, typing_action, get_user_id, new_logger, get_tip, new_user
-from .image import send_images
-from .search import Search, Weather
+from claquirou.admin import client, typing_action, get_user_id, new_logger, get_tip, new_user
+from claquirou.image import send_images
+from claquirou.search import Search, Weather
 from worker.download import send_files, shutdown
 
 
@@ -29,10 +29,8 @@ async def start(event):
         await new_user(user.id, user.first_name, user.last_name)
 
     else:
-        await event.respond(
-            f"{greeting} {user.first_name}.\nPour mettre fin à une conversation appuyez sur **/end** avant de cliquer "
-            f"sur "
-            f"**/options** pour choisir d'autre options. Pour avoir de l'aide, appuyez sur **/help**.\n\nNB: Le bot n'est plus maintenue depuis un moment et ne serait donc plus mis à jour.")
+        other = get_tip("OTHER")
+        await event.respond(f"{greeting} {user.first_name}.\n{other}")
 
     raise events.StopPropagation
 
@@ -43,7 +41,7 @@ async def helps(event):
     new_logger(chat_id).debug("HELP")
 
     await typing_action(chat_id)
-    with open("help.txt", "r") as f:
+    with open("fr/help.txt", "r") as f:
         data = f.read()
 
     await event.respond(data)
@@ -104,12 +102,12 @@ async def button(event):
 
 
 async def user_conversation(chat_id, tips, search=None, cmd=None):
-    out = 600 if chat_id in [711322052, 984343307] else 65
+    out = 600 if chat_id in [711322052] else 65
     
     try:
         async with client.conversation(chat_id, timeout=out) as conv:
-            msg = "\n\nPour mettre fin à la conversation et choisir une autre option, appuyez sur **/end**.\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020"
-            await conv.send_message(f"{tips} {msg}", parse_mode='md')
+            end_conv = get_tip("END_CONV")
+            await conv.send_message(f"{tips} \n\n{end_conv}", parse_mode='md')
 
             try:
                 continue_conv = True
@@ -157,7 +155,8 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                         continue_conv = False
 
             except asyncio.TimeoutError:
-                await conv.send_message("Conversation terminée!\n\nPour afficher les options appuyez sur **/options**.\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020 et ne serait donc plus mis à jour.")
+                timeout = get_tip("TIMEOUT")
+                await conv.send_message(timeout)
 
     except AlreadyInConversationError:
         await client.send_message(chat_id, get_tip("TIPS"))
@@ -165,18 +164,9 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
 
 @client.on(events.NewMessage)
 async def media(event):
-    if event.file:
-        await event.reply(
-            "Types de fichiers non pris en charge pour le moment. Ressayez plus tard...\n\nAppuyez sur **/options** "
-            "pour afficher les options.",
-            parse_mode="md")
+    if event.file or event.contact:
+        await event.reply("Appuyez sur **/options** pour afficher les options.", parse_mode="md")
         new_logger(event.chat_id).debug("FILE")
-
-    elif event.contact:
-        await event.respond("Vos contacts doivent rester privés!\n\nAppuyez sur **/options** pour afficher les options.",
-                            parse_mode="md")
-        new_logger(event.chat_id).debug("CONTACT")
-
 
 def sig_handler():
     asyncio.run_coroutine_threadsafe(shutdown(client), asyncio.get_event_loop())

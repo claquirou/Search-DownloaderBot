@@ -1,0 +1,24 @@
+{
+    "START": "We are happy to count you among our users😉. Press **/options** to display options.\nTo know how the bot works, press **/help** (**Read before you start**).\n\nNB: The bot is no longer maintained since 05/09/2020",
+
+    "WEB": "Tip:\n**For web search🌍, it's very simple, just pretend you're on Google** 😃\nIf you find errors, don't worry web search will soon be improved.",
+
+    "IMAGE": "Tip:\n**For picture search, write the picture📸 name followed by the number of pictures you want.**\nNB: The number of picture must be **less than or equal to 15**.",
+    
+    "AUDIO": "Tip:\n**To download the audio of a Facebook video, Youtube, TikTok etc... ([list of supported websites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)) you just need to paste the 🔗link of the video** 😉",
+    
+    "VIDEO": "Tip:\n**To download the video of a Facebook, Youtube, TikTok etc... ([list of supported websites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)), you just need to paste the 🔗link of the video** 😉",
+    
+    "METEO": "Tip:\n**To get the weather⛈ forecast of a city, just write the name of the city🗺**.\n__It's cool no__🤗",
+    
+    "END": "Thanks for using our service 😉.\nTo display options, press **/options**\n\nNB: The bot is no longer maintained since 05/09/2020",
+
+    "TIPS": "You are already in a conversation, to end it press **/end** before you can choose other options. For help press **/help**.",
+
+    "OTHER": "To end a conversation on **/end** before clicking on **/options** to choose other options. For help, press **/help**.",
+
+    "END_CONV": "To end the conversation and choose another option, press **/end**.\n\nNB: The bot is no longer maintained since 05/09/2020.",
+
+    "TIMEOUT": "The conversation is over!\n\nTo view options press **/options**..\n\nNB: The bot is no longer maintained since 05/09/2020."
+
+}

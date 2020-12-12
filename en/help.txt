@@ -1,0 +1,37 @@
+**BOT NOT MAINTAINED SINCE 18/06/2020.** 
+
+This bot allows you to search **web**, **images**, **weather** and also to **convert to audio or download online videos**...
+To display the available options, press /options.
+
+-- For web searches, just choose the **Web Search** option, then read the tip that appears and do your search!
+To get relevant results, be especially precise.
+Here are some examples:
+- The best player in the world.
+- What is a fever?
+- Synonym of seeing
+- Who created Facebook?
+- Word of a music etc...
+
+-- For image searches, just choose the option **Image Search**, then read the tip that appears and write the name of the image followed by the number of images you want.
+Examples:
+- Panther 5
+- Didier Drogba 9
+- Iphone 11 Pro Max 15
+
+-- For the weather, just choose the option **Weather**, then read the tip that appears and just write the name of the city.
+Examples:
+- Abidjan
+- Belin
+- Paris
+- Washington
+
+-- For audio and video, just choose the option **Download Audio** or **Download Video**, then read the tips that appears and just send the link (supports one or more links at a time) of the video to the bot and it will send you back the audio or video.
+Examples:
+- The link of a video from Facebook, Instagram, Twitter, TikTok or Youtube etc... [list of supported websites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)
+
+**IMPORTANT INFORMATION
+If you are in a conversation and want to choose other options, tap /end .
+During 65 seconds of inactivity in a conversation, the bot will take you back to the menu.
+
+
+** Author: @herve177**

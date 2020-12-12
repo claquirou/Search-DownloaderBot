@@ -21,8 +21,8 @@ from urlextract import URLExtract
 
 from . import av_source, av_utils, cut_time, fast_telethon, tgaction, thumb, zip_file
 
-TOKEN = os.environ["TOKEN"]
-# TOKEN = "1167018060:AAFtkT-TDr3lq-5ShAL0lj5gr0hFwlE7yas"
+# TOKEN = os.environ["TOKEN"]
+TOKEN = "1167018060:AAHPyj_3rN_zsEjC-0I23iUiQgBbcCdatI0"
 _bot = Bot(TOKEN)
 
 url_extractor = URLExtract()
