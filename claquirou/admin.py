@@ -10,7 +10,7 @@ from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 
 from claquirou.users import UserBot
-from claquirou.constant import PARAMS, TIPS_DIR
+from claquirou.constant import PARAMS, EN_TIPS, FR_TIPS
 
 
 config = configparser.ConfigParser()
@@ -19,13 +19,15 @@ config.read(PARAMS)
 API_ID = config["DEFAULT"]["API_ID"]
 API_HASH = config["DEFAULT"]["API_HASH"]
 TOKEN = config["DEFAULT"]["TOKEN"]
-ADMIN_ID = config["ADMIN"]["ID"]
+ADMIN_ID = int(config["ADMIN"]["ID"])
 
 # ADMIN_ID = os.environ["ADMIN_ID"]
 # API_ID = os.environ["API_ID"]
 # API_HASH = os.environ["API_HASH"]
 # TOKEN = os.environ["TOKEN"]
 # SESSION = os.environ["SESSION"]
+# ADMIN_ID = int(os.environ["ADMIN"])
+
 
 # client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
 client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
@@ -43,9 +45,13 @@ def new_logger(user_id):
     return logger
 
 
-def get_tip(tips):
-    with open(TIPS_DIR, "r") as f:
-        data = json.load(f)
+def get_tip(lang, tips):
+    if lang == "en":
+        with open(EN_TIPS, "r") as f:
+            data = json.load(f)
+    else:
+        with open(FR_TIPS, "r") as f:
+            data = json.load(f)
 
     return data.get(tips)
 
@@ -61,7 +67,7 @@ async def send_user():
     get_user = await database.select_data
     users = []
     for i in get_user:
-        info = {"ID": i[0], "Nom": i[1], "Prenom": i[2]}
+        info = {"ID": i[0], "Nom": i[1], "Prenom": i[2], "Langue": i[3]}
         users.append(info)
 
     with open("user.json", "w") as f:
@@ -73,15 +79,15 @@ async def typing_action(chat_id, chat_action="typing", period=3):
         await asyncio.sleep(period)
 
 
-async def new_user(chat_id, first_name, last_name):
+async def new_user(chat_id, first_name, last_name, lang):
     database = UserBot()
     all_users = await get_user_id()
 
     if chat_id not in all_users:
-        await database.add_data(chat_id, first_name, last_name)
+        await database.add_data(chat_id, first_name, last_name, lang)
         new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
 
-        info = f"Utilisateur {chat_id} ajouté\n\nNom: {first_name}\nPrénom: {last_name}"
+        info = f"New user\n\nID: {chat_id}\nNom: {first_name}\nPrénom: {last_name} Langue: {lang}"
         await client.send_message(711322052, info)
 
 

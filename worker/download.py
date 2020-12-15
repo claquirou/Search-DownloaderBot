@@ -204,13 +204,10 @@ async def download_file(client, chat_id, message, cmd, log):
                 params['playliststart'] = playlist_start
                 params['playlistend'] = playlist_end
             else:
-                get_playlist = message.split()
-                start = int(get_playlist[1])
-                end = int(get_playlist[-1])
-
-                if chat_id in [711322052, 984343307]:
-                    params['playliststart'] = start
-                    params['playlistend'] = end
+              
+                if chat_id in [711322052]:
+                    params['playliststart'] = 1
+                    params['playlistend'] = 500
                 else:
                     params['playliststart'] = 1
                     params['playlistend'] = 10

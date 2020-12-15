@@ -1,7 +1,7 @@
 import os
 
-FOLDER = os.path.dirname(__file__)
+FOLDER = os.path.dirname(os.path.dirname(__file__))
+PARAMS = os.path.join(FOLDER, "token.ini")
 
-IMAGE_DIR = os.path.join(os.path.dirname(FOLDER), "images")
-PARAMS = os.path.join(os.path.dirname(FOLDER), "token.ini")
-TIPS_DIR = os.path.join(FOLDER, "tips.json")
+EN_TIPS = os.path.join(FOLDER, "en/tips.json")
+FR_TIPS = os.path.join(FOLDER, "fr/tips.json")

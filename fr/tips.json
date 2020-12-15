@@ -15,7 +15,7 @@
 
     "TIPS": "Vous êtes déjà dans une conversation, pour y mettre fin appuyez sur **/end** avant de pouvoir choisir d'autre options. Pour avoir de l'aide appuyez sur **/help.**",
 
-    "OTHER": "Pour mettre fin à une conversation appuyez sur **/end** avant de cliquer sur **/options** pour choisir d'autre options. Pour avoir de l'aide, appuyez sur **/help**.",
+    "OTHER": "Pour mettre fin à une conversation appuyez sur **/end** avant d'appuyer sur **/options** pour choisir d'autre options. Pour avoir de l'aide, appuyez sur **/help**.",
 
     "END_CONV": "Pour mettre fin à la conversation et choisir une autre option, appuyez sur **/end**.\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020.",
 

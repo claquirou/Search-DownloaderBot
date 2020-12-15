@@ -11,11 +11,11 @@
     
     "METEO": "Tip:\n**To get the weather⛈ forecast of a city, just write the name of the city🗺**.\n__It's cool no__🤗",
     
-    "END": "Thanks for using our service 😉.\nTo display options, press **/options**\n\nNB: The bot is no longer maintained since 05/09/2020",
+    "END": "Thanks for using our service 😉.\nTo display options, press **/options**\n\nNB: The bot is no longer maintained since 05/09/2020.",
 
     "TIPS": "You are already in a conversation, to end it press **/end** before you can choose other options. For help press **/help**.",
 
-    "OTHER": "To end a conversation on **/end** before clicking on **/options** to choose other options. For help, press **/help**.",
+    "OTHER": "To end a conversation presss **/end** before pressing **/options** to choose other options. For help, press **/help**.",
 
     "END_CONV": "To end the conversation and choose another option, press **/end**.\n\nNB: The bot is no longer maintained since 05/09/2020.",
 

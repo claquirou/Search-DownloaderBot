@@ -25,7 +25,7 @@ def send_images(query):
             return "Le nombre de l'image doit être inférieur ou égale à 15.\nVeuillez réessayer svp."
         else:
             search = "+".join(query)
-            url = f"https://www.google.co.in/search?q={search}&source=lnms&tbm=isch"
+            url = f"https://www.google.com/search?q={search}&source=lnms&tbm=isch"
             return initialise_requests(url, number)
 
     except ValueError:
@@ -36,7 +36,7 @@ def send_images(query):
 # Scrap image
 def initialise_requests(url, number):
     # browser = webdriver.Chrome(executable_path=os.environ["CHROMEDRIVER_PATH"], chrome_options=chrome_options)
-    browser = webdriver.Chrome("/home/claquirou/Bureau/MyBot/chromedriver")
+    browser = webdriver.Chrome(".test/chromedriver")
     browser.get(url)
     extensions = {"jpg", "jpeg", "png", "gif"}
 
