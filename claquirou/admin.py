@@ -103,7 +103,7 @@ async def new_user(chat_id, first_name, last_name, language):
         new_logger(chat_id).info(f"UPDATED LANG: {language}")
 
     await database.commit_data
-    await client.send_message(ADMIN_ID, info)
+    await client.send_message(int(ADMIN_ID), info)
 
 
 @client.on(events.NewMessage(pattern="/users"))
