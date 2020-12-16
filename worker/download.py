@@ -21,8 +21,8 @@ from urlextract import URLExtract
 
 from . import av_source, av_utils, cut_time, fast_telethon, tgaction, thumb, zip_file
 
-# TOKEN = os.environ["TOKEN"]
-TOKEN = "1167018060:AAHPyj_3rN_zsEjC-0I23iUiQgBbcCdatI0"
+TOKEN = os.environ["TOKEN"]
+# TOKEN = "1167018060:AAHPyj_3rN_zsEjC-0I23iUiQgBbcCdatI0"
 _bot = Bot(TOKEN)
 
 url_extractor = URLExtract()
@@ -34,9 +34,9 @@ MAX_STORAGE_SIZE = 2000 * 1024 * 1024
 STORAGE_SIZE = MAX_STORAGE_SIZE
 
 
-async def send_files(client, chat_id, message, cmd, log):
+async def send_files(client, chat_id, message, cmd, log, lang):
     try:
-        msg_task = asyncio.get_event_loop().create_task(perform_task(client, chat_id, message, cmd, log))
+        msg_task = asyncio.get_event_loop().create_task(perform_task(client, chat_id, message, cmd, log, lang))
         asyncio.get_event_loop().create_task(task_timeout_cancel(msg_task, timemout=21600))
 
     except Exception as e:
@@ -51,10 +51,10 @@ async def task_timeout_cancel(task, timemout=5):
         task.cancel()
 
 
-async def perform_task(client, chat_id, message, cmd, log):
+async def perform_task(client, chat_id, message, cmd, log, lang):
     try:
         try:
-            await download_file(client, chat_id, message, cmd, log)
+            await download_file(client, chat_id, message, cmd, log, lang)
         except HTTPError as e:
             # crashing to try change ip
             # otherwise youtube.com will not allow us
@@ -165,14 +165,18 @@ async def upload_multipart_zip(client, source, name, file_size, chat_id, log):
             source.close()
 
 
-async def download_file(client, chat_id, message, cmd, log):
+async def download_file(client, chat_id, message, cmd, log, lang):
     global STORAGE_SIZE
 
     log.info(f"URL: {message}")
     urls = url_extractor.find_urls(message)
 
     if len(urls) == 0:
-        await client.send_message(chat_id, "L'URL de la vidéo est incorrect.")
+        print(lang)
+        if lang == "FR":
+            await client.send_message(chat_id, "Le lien de la vidéo est incorrect.")
+        else:
+            await client.send_message(chat_id, "Video link is incorrect.")
         return
 
     playlist_start = None

@@ -2,8 +2,8 @@ import os
 
 import psycopg2
 
-# DATABASE_URL = os.environ['DATABASE_URL']
-DATABASE_URL = "postgres://ptqrlbdhjodmii:010d69afabc3ee421677c2474702deb95b1b2981ec541bac535b69ae77b19a70@ec2-54-159-138-67.compute-1.amazonaws.com:5432/dtsrh6mt2bmlc"
+DATABASE_URL = os.environ['DATABASE_URL']
+# DATABASE_URL = "postgres://ptqrlbdhjodmii:010d69afabc3ee421677c2474702deb95b1b2981ec541bac535b69ae77b19a70@ec2-54-159-138-67.compute-1.amazonaws.com:5432/dtsrh6mt2bmlc"
 
 
 class UserBot:
@@ -38,15 +38,28 @@ class UserBot:
             """
         )
 
-        await self.commit_data()
+        self.conn.commit()
+    
+    async def update_data(self, user_id, lang):
+        update_query = """UPDATE botuser set lang = %s where identifiant = %s"""
+        self.cursor.execute(update_query, (lang, user_id))
+
+        self.conn.commit()
+    
+    async def get_lang(self, user_id):
+        data = "SELECT lang FROM botuser WHERE identifiant = %s"
+        self.cursor.execute(data, (user_id,))
+
+        return self.cursor.fetchall()
 
     @property
     async def select_data(self):
         self.cursor.execute("SELECT identifiant, nom, prenom, lang FROM botuser")
 
         return self.cursor.fetchall()
+    
 
+    @property
     async def commit_data(self):
-        self.conn.commit()
         self.cursor.close()
         self.conn.close()

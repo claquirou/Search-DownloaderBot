@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 
 
 class Search:
-    def __init__(self):
-        pass
+    def __init__(self, lang):
+        self.lang = lang
     
     def _setup_requests(self, query, head=False, meteo=False):
         search = query.replace(" ", "+")
@@ -21,11 +21,18 @@ class Search:
             response = requests.get(url, headers=http_headers)
 
         else:
-            url = f"https://www.google.com/search?lr=lang_fr&ie=UTF-8&q={search}"
-            if head:
-                response = requests.get(url, headers=http_headers)
+            if self.lang == "FR":
+                url = f"https://www.google.com/search?lr=lang_fr&ie=UTF-8&q={search}"
+                if head:
+                    response = requests.get(url, headers=http_headers)
+                else:
+                    response = requests.get(url, {"User-Agent": http_headers})
             else:
-                response = requests.get(url, {"User-Agent": http_headers})
+                url = f"https://www.google.com/search?hl=en&q={search}"
+                if head:
+                    response = requests.get(url, headers=http_headers)
+                else:
+                    response = requests.get(url, {"User-Agent": http_headers})
 
         return BeautifulSoup(response.text, "html.parser")
 
@@ -70,8 +77,9 @@ class Search:
                 continue
 
 class Weather(Search):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, lang):
+        self.lang = lang
+        super().__init__(lang)
     
     def results(self, query):
         soup = self._setup_requests(query, meteo=True)
@@ -84,7 +92,6 @@ class Weather(Search):
             precipitation = soup.find(id='wob_pp').text
             humidity = soup.find(id='wob_hm').text
             wind = soup.find(id='wob_ws').text
-
 
             return f"Localisation: {region}\nDate: {date}\nTempérature: {temperature_now}°C\nDescription: {weather_now}\nPrécipitation: {precipitation}\nHumidité: {humidity}\nVent: {wind}"
         

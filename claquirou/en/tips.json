@@ -19,6 +19,22 @@
 
     "END_CONV": "To end the conversation and choose another option, press **/end**.\n\nNB: The bot is no longer maintained since 05/09/2020.",
 
-    "TIMEOUT": "The conversation is over!\n\nTo view options press **/options**..\n\nNB: The bot is no longer maintained since 05/09/2020."
+    "TIMEOUT": "The conversation is over!\nTo view options press **/options**..\n\nNB: The bot is no longer maintained since 05/09/2020.",
+
+
+    
+    "CHOICE1": "Web Search🌍",
+    "CHOICE2": "Images Search📸",
+    "CHOICE3": "Download Audio🎧",
+    "CHOICE4": "Download Video🎥",
+    "CHOICE5": "Weather Data🌦",
+    "SELECT": "Please select an option:",
+
+    "FILE": "To view options press **/options**.",
+
+    "IMG1": "You have only written a number(s).\nPlease make a precise search...",
+    "IMG2": "The number of the image must be greater than 0.",
+    "IMG3": "The number of the image must be less than or equal to 15.\nPlease try again.",
+    "IMG4": "Incorrect format !\nYou made a mistake, write the name of the image followed by the number of images you want."
 
 }
