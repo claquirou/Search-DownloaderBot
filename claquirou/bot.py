@@ -32,7 +32,6 @@ async def button(event):
 
     if event.data == b"10":
         await event.delete()
-        await typing_action(user.id)
 
         now = time.strftime("%H", time.gmtime())
         greeting = "Bonjour" if 4 < int(now) < 18 else "Bonsoir"
@@ -49,7 +48,6 @@ async def button(event):
 
     elif event.data == b"20":
         await event.delete()
-        await typing_action(user.id)
 
         if user.id not in all_users:
             start_msg = get_tip("EN", "START")
