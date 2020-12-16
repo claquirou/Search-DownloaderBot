@@ -12,7 +12,6 @@ from telethon.sessions import StringSession
 from claquirou.users import UserBot
 from claquirou.constant import PARAMS, EN_TIPS, FR_TIPS
 
-
 # config = configparser.ConfigParser()
 # config.read(PARAMS)
 
@@ -28,8 +27,9 @@ TOKEN = os.environ["TOKEN"]
 SESSION = os.environ["SESSION"]
 ADMIN_ID = os.environ["ADMIN"]
 
-
 client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
+
+
 # client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
 
 
@@ -60,17 +60,20 @@ async def typing_action(chat_id, chat_action="typing", period=3):
     async with client.action(chat_id, chat_action):
         await asyncio.sleep(period)
 
+
 async def get_user_id():
     database = UserBot()
     get_user = await database.select_data
     return [i[0] for i in get_user]
 
+
 async def user_lang(user_id):
     database = UserBot()
     user = await database.get_lang(user_id)
-    
+
     for i in user:
         return str(i[0])
+
 
 async def send_user():
     database = UserBot()
@@ -91,14 +94,14 @@ async def new_user(chat_id, first_name, last_name, language):
     if chat_id not in all_users:
         await database.add_data(chat_id, first_name, last_name, language)
         info = f"NEW USER\n\n**ID**: {chat_id}\n**Nom**: {first_name}\n**Prénom**: {last_name}\n**Langue**: {language}"
-        
+
         new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
     else:
         await database.update_data(chat_id, language)
         info = f"UPDATED\n\nID: {chat_id}\nLanguage: {language}"
 
         new_logger(chat_id).info(f"UPDATED LANG: {language}")
-    
+
     await database.commit_data
     await client.send_message(ADMIN_ID, info)
 
