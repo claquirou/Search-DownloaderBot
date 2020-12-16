@@ -70,10 +70,10 @@ async def helps(event):
 
     await typing_action(chat_id)
     if await user_lang(chat_id) == LANG[0]:
-        with open("fr/help.txt", "r") as f:
+        with open("claquirou/fr/help.txt", "r") as f:
             data = f.read()
     else:
-        with open("en/help.txt", "r") as f:
+        with open("claquirou/en/help.txt", "r") as f:
             data = f.read()
 
     await event.respond(data)
