@@ -26,7 +26,7 @@ API_ID = os.environ["API_ID"]
 API_HASH = os.environ["API_HASH"]
 TOKEN = os.environ["TOKEN"]
 SESSION = os.environ["SESSION"]
-ADMIN_ID = int(os.environ["ADMIN"])
+ADMIN_ID = os.environ["ADMIN"]
 
 
 client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
