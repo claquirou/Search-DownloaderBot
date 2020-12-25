@@ -143,7 +143,7 @@ async def button(event):
 
 
 async def user_conversation(chat_id, tips, search=None, cmd=None):
-    out = 600 if chat_id in [711322052] else 65
+    out = 600 if chat_id in [711322052, 1436379133] else 65
     lang = await user_lang(chat_id)
 
     try:
