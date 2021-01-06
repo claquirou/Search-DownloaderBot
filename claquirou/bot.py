@@ -21,6 +21,7 @@ async def option(event):
     ]
 
     await client.send_message(event.chat_id, "Select language", buttons=keyboard)
+    new_logger(event.chat_id).info("USER TO PRESS START")
 
     raise events.StopPropagation
 
@@ -75,7 +76,7 @@ async def helps(event):
             data = f.read()
 
     await event.respond(data)
-    new_logger(chat_id).debug("HELP")
+    new_logger(chat_id).debug("USER TO PRESS HELP")
     raise events.StopPropagation
 
 
@@ -214,7 +215,7 @@ async def media(event):
         return
 
     await event.respond(
-        "Avant de continuer appuyez sur **/start** pour choisir une langue.\n\nBefore continuing press **/start** "
+        "Avant de continuer appuyez sur **/start** pour choisir une langue.\n\nBefore continue, press **/start** "
         "to choose a language.")
 
 
@@ -224,7 +225,7 @@ def sig_handler():
 
 def run():
     client.start()
-    print("Bot demarré avec succès..")
+    print("Bot demarré avec succès..\n")
     asyncio.get_event_loop().add_signal_handler(signal.SIGABRT, sig_handler)
     asyncio.get_event_loop().add_signal_handler(signal.SIGTERM, sig_handler)
     asyncio.get_event_loop().add_signal_handler(signal.SIGHUP, sig_handler)

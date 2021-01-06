@@ -172,7 +172,6 @@ async def download_file(client, chat_id, message, cmd, log, lang):
     urls = url_extractor.find_urls(message)
 
     if len(urls) == 0:
-        print(lang)
         if lang == "FR":
             await client.send_message(chat_id, "Le lien de la vidéo est incorrect.")
         else:
