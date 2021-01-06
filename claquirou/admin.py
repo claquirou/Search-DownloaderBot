@@ -177,6 +177,6 @@ async def user_count(event):
         if os.path.exists(LOG_FILE):
             os.remove(LOG_FILE)
             new_logger(chat_id).info("LOG FILE DELETED")
-            return
         
-        await event.respond("Le fichier 'log' a bien été supprimé.")
+            await event.respond("Le fichier 'log' a bien été supprimé.")
+           
