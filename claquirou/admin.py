@@ -48,7 +48,7 @@ def new_logger(user_id):
     save.setLevel(level=logging.DEBUG)
 
     handler = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter("%(asctime)s --> [%(levelname)s] <%(id)s>: %(message)s")
+    formatter = logging.Formatter("\n%(asctime)s --> [%(levelname)s] <%(id)s>: %(message)s")
     
     handler.setFormatter(formatter)
     save.setFormatter(formatter)
@@ -178,5 +178,7 @@ async def user_count(event):
             os.remove(LOG_FILE)
             new_logger(chat_id).info("LOG FILE DELETED")
         
-            await event.respond("Le fichier 'log' a bien été supprimé.")
+            await client.send_message(chat_id, "Le fichier log a bien été supprimé.")
            
+        else:
+            await client.send_message(chat_id, "Aucun fichier n'a été trouvé...")
