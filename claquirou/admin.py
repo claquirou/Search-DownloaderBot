@@ -37,7 +37,7 @@ client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot
 
 def create_log():
     if not os.path.exists(LOG_FILE):
-        os.makedirs("log", exist_ok=True)
+        os.makedirs(".log", exist_ok=True)
         
 def new_logger(user_id):
     create_log()
