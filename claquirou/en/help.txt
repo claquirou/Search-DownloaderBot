@@ -34,4 +34,4 @@ If you are in a conversation and want to choose other options, tap /end .
 During 65 seconds of inactivity in a conversation, the bot will take you back to the menu.
 
 
-** Author: **@herve177**
+** Author: **@claquirou**
