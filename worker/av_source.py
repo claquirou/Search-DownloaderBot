@@ -114,11 +114,11 @@ class FFMpegAV(DumbReader, ABC):
             cut_time_start = cut_time_start.isoformat()
 
         if aformat:
-            if cut_time_start is not None:
+            if cut_time_start is None:
+                _finput = ffmpeg.input(vformat['url'], headers=headers, i=aformat['url'])
+            else:
                 _finput = ffmpeg.input(vformat['url'], headers=headers, **{'noaccurate_seek': None}, ss=cut_time_start,
                                        i=aformat['url'])
-            else:
-                _finput = ffmpeg.input(vformat['url'], headers=headers, i=aformat['url'])
         else:
             if cut_time_start is not None:
                 _finput = ffmpeg.input(vformat['url'], headers=headers, **{'noaccurate_seek': None}, ss=cut_time_start)
@@ -136,54 +136,51 @@ class FFMpegAV(DumbReader, ABC):
                     acodec = 'mp3'
 
                 if acodec is not None:
-                    if not ff.file_name:
-                        _fstream = _finput.output('pipe:',
-                                                  format=acodec,
-                                                  acodec='copy',
-                                                  **{'vn': None})
-                    else:
+                    if ff.file_name:
                         _fstream = _finput.output(ff.file_name,
                                                   format=acodec,
                                                   acodec='copy',
                                                   **{'vn': None})
+                    else:
+                        _fstream = _finput.output('pipe:',
+                                                  format=acodec,
+                                                  acodec='copy',
+                                                  **{'vn': None})
             if not _fstream:
-                if not ff.file_name:
-                    _fstream = _finput.output('pipe:',
-                                              format='mp3',
-                                              acodec='mp3',
-                                              **{'vn': None})
-                else:
+                if ff.file_name:
                     _fstream = _finput.output(ff.file_name,
                                               format='mp3',
                                               acodec='mp3',
                                               **{'vn': None})
 
+                else:
+                    _fstream = _finput.output('pipe:',
+                                              format='mp3',
+                                              acodec='mp3',
+                                              **{'vn': None})
         else:
-            if format_name != '':
-                _format = format_name
-            else:
-                _format = ext if ext else 'mp4'
+            _format = format_name if format_name != '' else ext or 'mp4'
             if _format == 'mp4':
                 ff.format = _format
             audio_ext = aformat.get('ext', '') if aformat else ''
-            if _format == 'mp4' and (audio_ext == '' or (audio_ext == 'mp3' or audio_ext == 'm4a')):
+            if _format == 'mp4' and audio_ext in ['', 'mp3', 'm4a']:
                 acodec = 'copy'
             else:
                 acodec = 'mp3'
 
-            if not ff.file_name:
-                _fstream = _finput.output('pipe:',
-                                          format=_format,
-                                          vcodec='copy',
-                                          acodec=acodec,
-                                          movflags='frag_keyframe')
-            else:
+            if ff.file_name:
                 _fstream = _finput.output(ff.file_name,
                                           format=_format,
                                           vcodec='copy',
                                           acodec=acodec,
                                           movflags='faststart')
 
+            else:
+                _fstream = _finput.output('pipe:',
+                                          format=_format,
+                                          vcodec='copy',
+                                          acodec=acodec,
+                                          movflags='frag_keyframe')
         cut_time_duration_arg = []
         if cut_time_end is not None:
             cut_time_duration_arg += ['-t', cut_time_end, "-shortest"]

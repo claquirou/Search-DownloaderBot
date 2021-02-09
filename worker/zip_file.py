@@ -93,7 +93,7 @@ class ZipTorrentContentFile(Reader, ABC):
         f_name = ''
         for i in name:
             if not i.isalnum():
-                f_name += '_' if last_repl is False else ''
+                f_name += '_' if not last_repl else ''
                 last_repl = True
             else:
                 f_name += i
@@ -112,14 +112,13 @@ class ZipTorrentContentFile(Reader, ABC):
 
     @property
     def size(self):
-        if self.big:
-            data_left = self.real_size - (self.zip_num - 1) * TG_MAX_FILE_SIZE
-            if data_left > TG_MAX_FILE_SIZE:
-                return TG_MAX_FILE_SIZE
-            else:
-                return data_left
-        else:
+        if not self.big:
             return self._size
+        data_left = self.real_size - (self.zip_num - 1) * TG_MAX_FILE_SIZE
+        if data_left > TG_MAX_FILE_SIZE:
+            return TG_MAX_FILE_SIZE
+        else:
+            return data_left
 
     def close(self):
         self.zipstream.close()
@@ -200,7 +199,7 @@ class ZipTorrentContentFile(Reader, ABC):
             if data is None:
                 break
             resp += data
-            if not (len(resp) < n and self.processed_size < TG_MAX_FILE_SIZE):
+            if len(resp) >= n or self.processed_size >= TG_MAX_FILE_SIZE:
                 break
 
                 # if time.time() - self.last_progress_update > 2:

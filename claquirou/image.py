@@ -42,7 +42,7 @@ def initialise_requests(url, number):
     browser.get(url)
     extensions = {"jpg", "jpeg", "png", "gif"}
 
-    for _ in range(25):
+    for _ in range(50):
         browser.execute_script("window.scrollBy(0,200)")
         
     html = browser.page_source.split('["')

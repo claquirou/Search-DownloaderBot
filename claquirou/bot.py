@@ -5,16 +5,17 @@ import asyncio
 from telethon import Button, events
 from telethon.errors import AlreadyInConversationError
 
-from claquirou.admin import client, typing_action, get_user_id, user_lang, new_logger, get_tip, new_user
+from claquirou.admin import typing_action, get_user_id, user_lang, new_logger, get_tip, new_user
+from claquirou.credential import ADMIN_ID, client
 from claquirou.image import send_images
-from claquirou.search import Search, Weather
+from claquirou.search import Search
 from worker.download import send_files, shutdown
 
 LANG = ["FR", "EN"]
 
 
 @client.on(events.NewMessage(pattern="/start"))
-async def option(event):
+async def language_choice(event):
     keyboard = [
         [Button.inline("French 🇫🇷", b"10"),
          Button.inline("English 🇺🇸", b"20")],
@@ -27,7 +28,7 @@ async def option(event):
 
 
 @client.on(events.CallbackQuery)
-async def button(event):
+async def language_button(event):
     user = event.chat
     all_users = await get_user_id()
 
@@ -84,65 +85,68 @@ loop = asyncio.get_event_loop()
 
 
 @client.on(events.NewMessage(pattern="/options"))
-async def option(event):
+async def options(event):
     chat_id = event.chat_id
     all_users = await get_user_id()
 
-    if chat_id in all_users:
-        lang = await user_lang(chat_id)
-        keyboard = [
-            [Button.inline(get_tip(lang, "CHOICE1"), b"1"),
-             Button.inline(get_tip(lang, "CHOICE2"), b"2")],
+    if chat_id not in all_users:
+        await event.respond(
+            "Avant de continuer appuyez sur **/start** pour choisir une langue.\n\nBefore continue press **/start** "
+            "to choose a language.")
+        return
 
-            [Button.inline(get_tip(lang, "CHOICE3"), b"3"),
-             Button.inline(get_tip(lang, "CHOICE4"), b"4")],
+    lang = await user_lang(chat_id)
+    keyboard = [
+        [Button.inline(get_tip(lang, "CHOICE1"), b"1"),
+         Button.inline(get_tip(lang, "CHOICE2"), b"2")],
 
-            [Button.inline(get_tip(lang, "CHOICE5"), b"5")]
-        ]
+        [Button.inline(get_tip(lang, "CHOICE3"), b"3"),
+         Button.inline(get_tip(lang, "CHOICE4"), b"4")],
 
-        loop.create_task(client.send_message(chat_id, get_tip(lang, "SELECT"), buttons=keyboard))
-        raise events.StopPropagation
+        [Button.inline(get_tip(lang, "CHOICE5"), b"5")]
+    ]
 
-    await event.respond(
-        "Avant de continuer appuyez sur **/start** pour choisir une langue.\n\nBefore continuing press **/start** "
-        "to choose a language.")
+    loop.create_task(client.send_message(chat_id, get_tip(lang, "SELECT"), buttons=keyboard))
+    raise events.StopPropagation
 
 
 @client.on(events.CallbackQuery)
-async def button(event):
+async def buttons(event):
     chat_id = event.chat_id
     lang = await user_lang(chat_id)
 
-    if event.data == b"1" or event.data == b"01":
+    if event.data == b"1":
         await event.delete()
         search = Search(lang)
         loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip(lang, "WEB"), search=search))
 
-    elif event.data == b"2" or event.data == b"02":
+    elif event.data == b"2":
         await event.delete()
         loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip(lang, "IMAGE"), search="image"))
 
-
-    elif event.data == b"3" or event.data == b"03":
+    elif event.data == b"3":
         await event.delete()
         loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip(lang, "AUDIO"), cmd="a"))
 
-
-    elif event.data == b"4" or event.data == b"04":
+    elif event.data == b"4":
         await event.delete()
         loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip(lang, "VIDEO"), cmd="v"))
 
-
-    elif event.data == b"5" or event.data == b"05":
+    elif event.data == b"5":
         await event.delete()
-        weather = Weather(lang)
-        loop.create_task(user_conversation(chat_id=chat_id, tips=get_tip(lang, "METEO"), search=weather))
+        if await user_lang(chat_id) == LANG[0]:
+            msg = "Désolé, cette option est momentanément indisponible 😕.\n\n Pour afficher les options, appuyez sur " \
+                  "**/options**."
+        else:
+            msg = "Sorry, this option is temporarily unavailable 😕.\n\nTo view options press **/options**."
+
+        await event.respond(msg)
 
     raise events.StopPropagation
 
 
 async def user_conversation(chat_id, tips, search=None, cmd=None):
-    out = 600 if chat_id in [1468858929] else 120
+    out = 600 if chat_id in ADMIN_ID else 120
     lang = await user_lang(chat_id)
 
     try:
@@ -176,7 +180,7 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
                                     await conv.send_message(images)
 
                             else:
-                                await typing_action(chat_id, period=7)
+                                await typing_action(chat_id, period=5)
                                 try:
                                     result = search.results(response.raw_text)
                                     await conv.send_message(result)

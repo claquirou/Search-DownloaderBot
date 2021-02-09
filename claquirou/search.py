@@ -6,33 +6,26 @@ class Search:
     def __init__(self, lang):
         self.lang = lang
 
-    def _setup_requests(self, query, head=False, meteo=False):
-        search = query.replace(" ", "+")
+    def _setup_requests(self, query, head=False):
         http_headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                          "Chrome/44.0.2403.157 Safari/537.36",
             "Accept-Charset": "fr-FR,en;q=0.5",
             "Accept": "gzip, deflate",
             "Accept-Encoding": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
             "Accept-Language": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         }
 
-        if meteo:
-            url = f"https://www.google.com/search?hl=fr&q=meteo+{search}"
-            response = requests.get(url, headers=http_headers)
+        search = query.replace(" ", "+")
 
+        if self.lang == "FR":
+            url = f"https://www.google.com/search?lr=lang_fr&ie=UTF-8&q={search}"
         else:
-            if self.lang == "FR":
-                url = f"https://www.google.com/search?lr=lang_fr&ie=UTF-8&q={search}"
-                if head:
-                    response = requests.get(url, headers=http_headers)
-                else:
-                    response = requests.get(url, {"User-Agent": http_headers})
-            else:
-                url = f"https://www.google.com/search?hl=en&q={search}"
-                if head:
-                    response = requests.get(url, headers=http_headers)
-                else:
-                    response = requests.get(url, {"User-Agent": http_headers})
+            url = f"https://www.google.com/search?hl=en&q={search}"
+        if head:
+            response = requests.get(url, headers=http_headers)
+        else:
+            response = requests.get(url, {"User-Agent": http_headers})
 
         return BeautifulSoup(response.text, "html.parser")
 
@@ -51,7 +44,7 @@ class Search:
             page = [i.text.replace(".", "\n") for i in page]
             return "\n".join(page)
 
-        else:
+        finally:
             page = soup.find_all(tag, attrs)
             page = [i.text for i in page]
             return "\n".join(page)
@@ -77,27 +70,5 @@ class Search:
                 continue
 
 
-class Weather(Search):
-    def __init__(self, lang):
-        self.lang = lang
-        super().__init__(lang)
-
-    def results(self, query):
-        soup = self._setup_requests(query, meteo=True)
-
-        try:
-            region = soup.find(id='wob_loc').text
-            temperature_now = soup.find(id='wob_tm').text
-            date = soup.find(id='wob_dts').text
-            weather_now = soup.find(id='wob_dc').text
-            precipitation = soup.find(id='wob_pp').text
-            humidity = soup.find(id='wob_hm').text
-            wind = soup.find(id='wob_ws').text
-
-            return f"Localisation: {region}\nDate: {date}\nTempérature: {temperature_now}°C\nDescription: {weather_now}\nPrécipitation: {precipitation}\nHumidité: {humidity}\nVent: {wind} "
-
-        except AttributeError:
-            return "Ville incorrecte! Assurez d'avoir bien saisie le nom de la ville"
-
-
-
+if __name__ == '__main__':
+    a = Search("EN")

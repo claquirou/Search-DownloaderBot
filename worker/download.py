@@ -13,18 +13,17 @@ from urllib.parse import urlparse, urlunparse
 import aiofiles
 import youtube_dl
 from aiogram import Bot
+from claquirou.credential import TOKEN, ADMIN_ID
 from telethon.errors import AuthKeyDuplicatedError, BadRequestError
 from telethon.tl.types import (DocumentAttributeAudio,
                                DocumentAttributeFilename,
                                DocumentAttributeVideo)
 from urlextract import URLExtract
 
-from . import av_source, av_utils, cut_time, fast_telethon, tgaction, thumb, zip_file
+from . import (av_source, av_utils, cut_time, fast_telethon, tgaction, thumb,
+               zip_file)
 
-TOKEN = os.environ["TOKEN"]
-# TOKEN = "1167018060:AAHPyj_3rN_zsEjC-0I23iUiQgBbcCdatI0"
 _bot = Bot(TOKEN)
-
 url_extractor = URLExtract()
 
 TG_MAX_FILE_SIZE = 2000 * 1024 * 1024
@@ -69,19 +68,15 @@ async def perform_task(client, chat_id, message, cmd, log, lang):
             # crashing to try change ip
             # otherwise youtube.com will not allow us
             # to download any video for some time
-            if e.exc_info[0] is HTTPError:
-                if e.exc_info[1].file.code == 429:
-                    log.critical(e)
-                    await shutdown(client)
+            if e.exc_info[0] is HTTPError and e.exc_info[1].file.code == 429:
+                log.critical(e)
+                await shutdown(client)
 
             log.exception(e)
             await client.send_message(chat_id, str(e))
         except Exception as e:
             log.exception(e)
-            if 'ERROR' not in str(e):
-                err_msg = 'ERROR: ' + str(e)
-            else:
-                err_msg = str(e)
+            err_msg = 'ERROR: ' + str(e) if 'ERROR' not in str(e) else str(e)
             await client.send_message(chat_id, err_msg)
     except Exception as e:
         log.error(e)
@@ -207,13 +202,13 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                 params['playliststart'] = playlist_start
                 params['playlistend'] = playlist_end
             else:
-              
-                if chat_id in [711322052]:
+
+                if chat_id in ADMIN_ID:
                     params['playliststart'] = 1
                     params['playlistend'] = 500
                 else:
                     params['playliststart'] = 1
-                    params['playlistend'] = 10
+                    params['playlistend'] = 15
 
             ydl = youtube_dl.YoutubeDL(params=params)
             recover_playlist_index = None  # to save last playlist position if finding format failed
@@ -757,7 +752,7 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                                 if inspect.iscoroutinefunction(upload_file.close):
                                     await upload_file.close()
                                 else:
-                                    upload_file.close()
+                                    await upload_file.close()
 
                         if audio_mode:
                             if performer is None:
