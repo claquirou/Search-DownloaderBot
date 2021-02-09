@@ -7,7 +7,7 @@ from telethon.sessions import StringSession
 from .constant import PARAMS
 
 
-ADMIN_ID = []
+ADMIN_ID = [1468858929]
 USER_BLOCKED = []
 
 
