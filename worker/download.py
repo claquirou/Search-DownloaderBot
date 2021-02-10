@@ -752,7 +752,7 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                                 if inspect.iscoroutinefunction(upload_file.close):
                                     await upload_file.close()
                                 else:
-                                    await upload_file.close()
+                                    upload_file.close()
 
                         if audio_mode:
                             if performer is None:
