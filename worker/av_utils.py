@@ -163,11 +163,8 @@ async def m3u8_video_size(url, http_headers=None):
             m3u8_data = await resp.read()
             m3u8_obj = m3u8.loads(m3u8_data.decode())
             m3u8_obj.base_uri = m3u8_parse_url(str(resp.url))
-        size = sum(
-            await media_size(
-                seg.absolute_uri, session=session, http_headers=http_headers
-            )
-            for seg in m3u8_obj.segments
-        )
+        size = 0
+        for seg in m3u8_obj.segments:
+            size += await media_size(seg.absolute_uri, session=session, http_headers=http_headers)
 
     return size
