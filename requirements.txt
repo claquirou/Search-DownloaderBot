@@ -17,5 +17,5 @@ pycares==3.1.1
 aiodns==2.0.0
 psycopg2-binary==2.8.5
 selenium==3.141.0
-youtube-dl==2021.04.17
+youtube-dl==2021.04.26
 
