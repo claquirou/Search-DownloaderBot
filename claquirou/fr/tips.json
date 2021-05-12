@@ -3,7 +3,7 @@
 
     "WEB": "Astuce:\n**Pour faire des recherches Web🌍, c'est tout simple, faite comme si vous etiez sur Google** 😃\nSi vous constatez des erreurs, ne vous inquiété pas les recherches web seront bientôt amélioré.",
 
-    "IMAGE": "Astuce:\n**Pour faire des recherches d'Images, écrivez le nom de l'image suivi du nombre d'image📸 que vous voulez.**\nNB: Le nombre d'image doit être **inférieur ou égal à 15**.",
+    "IMAGE": "Astuce:\n**Pour faire des recherches d'Images, écrivez le nom de l'image suivi du nombre d'image📸 que vous voulez.**\nNB: Le nombre d'image doit être **inférieur ou égal à 20**.",
     
     "AUDIO": "Astuce:\n**Pour avoir l'audio d'une vidéo Facebook, Youtube etc... ([liste des sites web supporté](https://ytdl-org.github.io/youtube-dl/supportedsites.html)) il vous suffit juste de coller le 🔗lien de la vidéo** 😉",
     
@@ -33,6 +33,6 @@
 
     "IMG1": "Vous avez uniquement écrit un/des chiffre(s)\nFaites des recherches précises svp...",
     "IMG2": "Le nombre de l'image doit être supérieur à 0.",
-    "IMG3": "Le nombre de l'image doit être inférieur ou égale à 15.\nVeuillez réessayer svp.",
+    "IMG3": "Le nombre de l'image doit être inférieur ou égale à 20.\nVeuillez réessayer svp.",
     "IMG4": "Format incorrect !\nVous avez fait une erreur, écrivez le nom de l'image suivi du nombre d'image que vous voulez."
 }

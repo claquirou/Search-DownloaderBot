@@ -3,7 +3,7 @@
 
     "WEB": "Tip:\n**For web search🌍, it's very simple, just pretend you're on Google** 😃\nIf you find errors, don't worry web search will soon be improved.",
 
-    "IMAGE": "Tip:\n**For picture search, write the picture📸 name followed by the number of pictures you want.**\nNB: The number of picture must be **less than or equal to 15**.",
+    "IMAGE": "Tip:\n**For picture search, write the picture📸 name followed by the number of pictures you want.**\nNB: The number of picture must be **less than or equal to 20**.",
     
     "AUDIO": "Tip:\n**To download the audio of a Facebook video, Youtube, TikTok etc... ([list of supported websites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)) you just need to paste the 🔗link of the video** 😉",
     
@@ -34,7 +34,7 @@
 
     "IMG1": "You have only written a number(s).\nPlease make a precise search...",
     "IMG2": "The number of the image must be greater than 0.",
-    "IMG3": "The number of the image must be less than or equal to 15.\nPlease try again.",
+    "IMG3": "The number of the image must be less than or equal to 20.\nPlease try again.",
     "IMG4": "Incorrect format !\nYou made a mistake, write the name of the image followed by the number of images you want."
 
 }

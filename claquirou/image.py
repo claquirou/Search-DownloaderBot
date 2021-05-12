@@ -5,12 +5,12 @@ from selenium import webdriver
 
 from claquirou.admin import get_tip
 
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ["GOOGLE_CHROME_BIN"]
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")
+# chrome_options = webdriver.ChromeOptions()
+# chrome_options.binary_location = os.environ["GOOGLE_CHROME_BIN"]
+# chrome_options.add_argument('--disable-gpu')
+# chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--disable-dev-shm-usage")
+# chrome_options.add_argument("--no-sandbox")
 
 
 def send_images(query, lang):
@@ -24,7 +24,7 @@ def send_images(query, lang):
         number = int(img_number)
         if number <= 0:
             return get_tip(lang, "IMG2")
-        elif number > 15:
+        elif number > 20:
             return get_tip(lang, "IMG3")
         else:
             search = "+".join(query)
@@ -37,13 +37,13 @@ def send_images(query, lang):
 
 # Scrap image
 def initialise_requests(url, number):
-    browser = webdriver.Chrome(executable_path=os.environ["CHROMEDRIVER_PATH"], chrome_options=chrome_options)
-    # browser = webdriver.Chrome(".test/chromedriver")
+    # browser = webdriver.Chrome(executable_path=os.environ["CHROMEDRIVER_PATH"], chrome_options=chrome_options)
+    browser = webdriver.Chrome(".test/chromedriver")
     browser.get(url)
     extensions = {"jpg", "jpeg", "png", "gif"}
 
     for _ in range(50):
-        browser.execute_script("window.scrollBy(0,200)")
+        browser.execute_script("window.scrollBy(0,500)")
         
     html = browser.page_source.split('["')
     images = [i.split('"')[0] for i in html if i.startswith('http') and i.split('"')[0].split('.')[-1] in extensions]

@@ -16,7 +16,7 @@ Here are some examples:
 Examples:
 - Panther 5
 - Didier Drogba 9
-- Iphone 11 Pro Max 15
+- Iphone 11 Pro Max 20
 
 -- For the weather, just choose the option **Weather**, then read the tip that appears and just write the name of the city.
 Examples:

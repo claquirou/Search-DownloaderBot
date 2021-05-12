@@ -535,9 +535,14 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                             _file_size += 10 * 1024 * 1024  # 10MB
 
                         log.debug('Fichier en cours de téléchargement...')
-                        await client.send_message(chat_id,
-                                                  "Votre fichier est en cours de telechargement. Patientez quelque "
+                        if lang == "FR":
+                            await client.send_message(chat_id,
+                                                  "Votre fichier est en cours de téléchargement. Patientez quelque "
                                                   "seconde.")
+                        else:
+                            await client.send_message(chat_id,
+                                                  "Your file is being downloaded. Please wait a few seconds.")
+                        return
 
                         width = height = video_codec = audio_codec = None
                         title = performer = None
