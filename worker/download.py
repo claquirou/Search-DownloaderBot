@@ -542,7 +542,7 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                         else:
                             await client.send_message(chat_id,
                                                   "Your file is being downloaded. Please wait a few seconds.")
-                        return
+                    
 
                         width = height = video_codec = audio_codec = None
                         title = performer = None
