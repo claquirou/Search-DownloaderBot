@@ -228,6 +228,43 @@ async def media(event):
         return
 
 
+@client.on(events.NewMessage(pattern="/addAdmin"))
+async def admin(event):
+    chat_id = event.chat_id
+    lang = await user_lang(chat_id)
+
+    try:
+        async with client.conversation(chat_id, timeout=120) as conv:
+            await conv.send_message(f"Quel est le ID de l'utilisateur à ajouter?", parse_mode='md')
+
+            try:
+                continue_conv = True
+
+                while continue_conv:
+                    response = conv.get_response()
+                    response = await response
+
+                    if response.raw_text != "/end":
+                        try:
+                            ADMIN_ID.append(response.raw_text)
+                            await conv.send_message(f"La liste des ADMINS à été mis à jour.\n\nLa nouvelle liste est:\n{ADMIN_ID}")
+                        except Exception as e:
+                            await conv.send_message(e)
+
+                    else:
+                        await conv.send_message(get_tip(lang, "END"))
+                        continue_conv = False
+
+            except asyncio.TimeoutError:
+                timeout = get_tip(lang, "TIMEOUT")
+                await conv.send_message(timeout)
+                
+
+    except AlreadyInConversationError:
+        await client.send_message(chat_id, get_tip(lang, "TIPS"))
+
+
+
 def sig_handler():
     asyncio.run_coroutine_threadsafe(shutdown(client), asyncio.get_event_loop())
 
