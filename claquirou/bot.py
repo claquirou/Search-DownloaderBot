@@ -246,7 +246,7 @@ async def admin(event):
 async def admin_conv(chat_id, func):
 
     if chat_id not in ADMIN_ID:
-        await client.send_message("Vous n'êtes pas autorisé a utiliser cette commande.")
+        await client.send_message(chat_id, "Vous n'êtes pas autorisé a utiliser cette commande.")
         return
 
     lang = await user_lang(chat_id)
