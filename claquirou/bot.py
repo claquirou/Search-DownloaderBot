@@ -280,7 +280,7 @@ async def admin_conv(chat_id, func):
                                 await conv.send_message(e)
 
                     else:
-                        await conv.send_message(get_tip(lang, "La liste des UTILISATEURS à bien été mis à jour."))
+                        await conv.send_message("La liste des UTILISATEURS à bien été mis à jour.")
                         continue_conv = False
 
             except asyncio.TimeoutError:
