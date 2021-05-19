@@ -12,6 +12,10 @@ from claquirou.search import Search
 from worker.download import send_files, shutdown
 
 LANG = ["FR", "EN"]
+ADMIN_ID = [1468858929]
+
+fr_msg = "Désolé, ce bot n'est malheureusement plus disponible au grand public et nous vous présentons toutes nos excuses...\nA bientôt😉."
+en_msg = "Sorry, this bot is unfortunately no longer available to the general public and we apologize...\nSee you soon😉."
 
 
 @client.on(events.NewMessage(pattern="/start"))
@@ -30,51 +34,50 @@ async def language_choice(event):
 @client.on(events.CallbackQuery)
 async def language_button(event):
     user = event.chat
-    all_users = await get_user_id()
 
     if event.data == b"10":
         await event.delete()
 
-        now = time.strftime("%H", time.gmtime())
-        greeting = "Bonjour" if 4 < int(now) < 18 else "Bonsoir"
-
-        if user.id not in all_users:
-            start_msg = get_tip("FR", "START")
-            message = f"{greeting} {user.first_name}.\n{start_msg}"
-            await event.respond(message)
-        else:
-            other = get_tip("FR", "OTHER")
-            await event.respond(f"{greeting} {user.first_name}.\n{other}")
-
+        if user.id not in ADMIN_ID:
+            await event.respond(fr_msg)
+            return
+        
+        other = get_tip("FR", "OTHER")
+        await event.respond(f"Hello {user.first_name}.\n{other}")
         await new_user(user.id, user.first_name, user.last_name, LANG[0])
 
     elif event.data == b"20":
         await event.delete()
 
-        if user.id not in all_users:
-            start_msg = get_tip("EN", "START")
-            message = f"Hello {user.first_name}.\n{start_msg}"
-
-            await event.respond(message)
-
-        else:
-            other = get_tip("EN", "OTHER")
-            await event.respond(f"Hello {user.first_name}.\n{other}")
-
+        if user.id not in ADMIN_ID:
+            await event.respond(en_msg)
+            return
+        
+        other = get_tip("EN", "OTHER")
+        await event.respond(f"Hello {user.first_name}.\n{other}")
         await new_user(user.id, user.first_name, user.last_name, LANG[1])
 
 
 @client.on(events.NewMessage(pattern="/help"))
 async def helps(event):
     chat_id = event.chat_id
+    lang = await user_lang(chat_id)
 
-    await typing_action(chat_id)
-    if await user_lang(chat_id) == LANG[0]:
-        with open("claquirou/fr/help.txt", "r") as f:
-            data = f.read()
+    if chat_id not in ADMIN_ID:
+        if lang == LANG[0]:
+            await event.respond(fr_msg)
+        else:
+            await event.respond(en_msg)
+        return
+
     else:
-        with open("claquirou/en/help.txt", "r") as f:
-            data = f.read()
+        await typing_action(chat_id)
+        if lang == LANG[0]:
+            with open("claquirou/fr/help.txt", "r") as f:
+                data = f.read()
+        else:
+            with open("claquirou/en/help.txt", "r") as f:
+                data = f.read()
 
     await event.respond(data)
     new_logger(chat_id).debug("USER TO PRESS HELP")
@@ -87,15 +90,15 @@ loop = asyncio.get_event_loop()
 @client.on(events.NewMessage(pattern="/options"))
 async def options(event):
     chat_id = event.chat_id
-    all_users = await get_user_id()
-
-    if chat_id not in all_users:
-        await event.respond(
-            "Avant de continuer appuyez sur **/start** pour choisir une langue.\n\nBefore continue press **/start** "
-            "to choose a language.")
+    
+    lang = await user_lang(chat_id)
+    if chat_id not in ADMIN_ID:
+        if lang == LANG[0]:
+            await event.respond(fr_msg)
+        else:
+            await event.respond(en_msg)
         return
 
-    lang = await user_lang(chat_id)
     keyboard = [
         [Button.inline(get_tip(lang, "CHOICE1"), b"1"),
          Button.inline(get_tip(lang, "CHOICE2"), b"2")],
@@ -210,17 +213,19 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
 @client.on(events.NewMessage)
 async def media(event):
     lang = await user_lang(event.chat_id)
-    all_users = await get_user_id()
 
-    if event.chat_id in all_users:
+    if event.chat_id not in ADMIN_ID:
+        if lang == LANG[0]:
+            await event.respond(fr_msg)
+        else:
+            await event.respond(en_msg)
+        return
+
+    else:
         if event.file or event.contact:
             await event.reply(get_tip(lang, "FILE"), parse_mode="md")
             new_logger(event.chat_id).debug("FILE")
         return
-
-    await event.respond(
-        "Avant de continuer appuyez sur **/start** pour choisir une langue.\n\nBefore continue, press **/start** "
-        "to choose a language.")
 
 
 def sig_handler():
