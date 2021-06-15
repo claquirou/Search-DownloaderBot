@@ -79,7 +79,7 @@ async def helps(event):
             with open("claquirou/en/help.txt", "r") as f:
                 data = f.read()
 
-    await event.respond(data)
+        await event.respond(data)
     new_logger(chat_id).debug("USER TO PRESS HELP")
     raise events.StopPropagation
 
