@@ -12,7 +12,7 @@ from claquirou.search import Search
 from worker.download import send_files, shutdown
 
 LANG = ["FR", "EN"]
-ADMIN_ID = [1468858929, 1799126743]
+ADMIN_ID = [1468858929, 1799126743, 975714395]
 
 fr_msg = "Désolé, ce bot n'est malheureusement plus disponible au grand public et nous vous présentons toutes nos excuses...\nA bientôt😉."
 en_msg = "Sorry, this bot is unfortunately no longer available to the general public and we apologize...\nSee you soon😉."
