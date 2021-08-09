@@ -21,7 +21,7 @@ API_HASH = config["DEFAULT"]["API_HASH"]
 TOKEN = config["DEFAULT"]["TOKEN"]
 ADMIN_ID = config["ADMIN"]["ID"]
 
-# ADMIN_ID = os.environ["ADMIN_ID"]
+# sADMIN_ID = os.environ["ADMIN_ID"]
 # API_ID = os.environ["API_ID"]
 # API_HASH = os.environ["API_HASH"]
 # TOKEN = os.environ["TOKEN"]
