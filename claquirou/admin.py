@@ -13,22 +13,22 @@ from claquirou.users import UserBot
 from claquirou.constant import PARAMS, TIPS_DIR
 
 
-# config = configparser.ConfigParser()
-# config.read(PARAMS)
+config = configparser.ConfigParser()
+config.read(PARAMS)
 
-# API_ID = config["DEFAULT"]["API_ID"]
-# API_HASH = config["DEFAULT"]["API_HASH"]
-# TOKEN = config["DEFAULT"]["TOKEN"]
-# ADMIN_ID = config["ADMIN"]["ID"]
+API_ID = config["DEFAULT"]["API_ID"]
+API_HASH = config["DEFAULT"]["API_HASH"]
+TOKEN = config["DEFAULT"]["TOKEN"]
+ADMIN_ID = config["ADMIN"]["ID"]
 
-ADMIN_ID = os.environ["ADMIN_ID"]
-API_ID = os.environ["API_ID"]
-API_HASH = os.environ["API_HASH"]
-TOKEN = os.environ["TOKEN"]
-SESSION = os.environ["SESSION"]
+# ADMIN_ID = os.environ["ADMIN_ID"]
+# API_ID = os.environ["API_ID"]
+# API_HASH = os.environ["API_HASH"]
+# TOKEN = os.environ["TOKEN"]
+# SESSION = os.environ["SESSION"]
 
-client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
-# client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
+# client = TelegramClient(StringSession(SESSION), int(API_ID), API_HASH).start(bot_token=TOKEN)
+client = TelegramClient(None, int(API_ID), API_HASH).start(bot_token=TOKEN)
 
 
 def new_logger(user_id):
