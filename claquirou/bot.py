@@ -104,7 +104,7 @@ async def button(event):
 
 
 async def user_conversation(chat_id, tips, search=None, cmd=None):
-    out = 600 if chat_id in [711322052, 984343307] else 65
+    out = 900 if chat_id in [1468858929, 984343307] else 65
     
     try:
         async with client.conversation(chat_id, timeout=out) as conv:
