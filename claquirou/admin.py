@@ -19,7 +19,7 @@ config.read(PARAMS)
 API_ID = config["DEFAULT"]["API_ID"]
 API_HASH = config["DEFAULT"]["API_HASH"]
 TOKEN = config["DEFAULT"]["TOKEN"]
-ADMIN_ID = config["ADMIN"]["ID"]
+ADMIN_ID = 1468858929
 
 # sADMIN_ID = os.environ["ADMIN_ID"]
 # API_ID = os.environ["API_ID"]
@@ -82,7 +82,7 @@ async def new_user(chat_id, first_name, last_name):
         new_logger(chat_id).info("NOUVEL UTILISATEUR ajouté à la base de donnée.")
 
         info = f"Utilisateur {chat_id} ajouté\n\nNom: {first_name}\nPrénom: {last_name}"
-        await client.send_message(711322052, info)
+        await client.send_message(1468858929, info)
 
 
 @client.on(events.NewMessage(pattern="/users"))
