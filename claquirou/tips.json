@@ -1,5 +1,5 @@
 {
-    "START": "Nous sommes heureux de vous compter parmi nos utilisateurs 😉.Appuyez sur **/options** pour afficher les options.\nPour savoir comment le bot fonctionne, appuyez sur **/help** (**À lire avant de commencer**).\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020",
+    "START": "Nous sommes heureux de vous compter parmi nos utilisateurs 😉.Appuyez sur **/options** pour afficher les options.\nPour savoir comment le bot fonctionne, appuyez sur **/help** (**À lire avant de commencer**).",
 
     "WEB": "Astuce:\n**Pour faire des recherches Web🌍, c'est tout simple, faite comme si vous etiez sur Google** 😃\nBientôt les recherches web seront amélioré avec une IA.",
 
@@ -11,7 +11,7 @@
     
     "METEO": "Astuce:\n**Pour avoir la météo⛈ d'une ville, écrivez juste le nom de la ville🗺**.\n__C'est cool non__🤗",
     
-    "END": "Merci d'avoir utilisé notre service 😉.\nPour afficher les options, appuyez sur **/options**.",
+    "END": "Merci d'avoir utilisé notre service 😉.\nPour afficher les options, appuyez sur **/options**.\n\nNB: Si vous rencontrez des problème, n'hésitez pas à me contacter @claquirou.",
 
     "TIPS": "Vous êtes déjà dans une conversation, pour y mettre fin appuyez sur **/end** avant de pouvoir choisir d'autre options. Pour avoir de l'aide appuyez sur **/help.**"
 
