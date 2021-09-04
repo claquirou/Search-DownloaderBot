@@ -32,7 +32,7 @@ async def start(event):
         await event.respond(
             f"{greeting} {user.first_name}.\nPour mettre fin à une conversation appuyez sur **/end** avant de cliquer "
             f"sur "
-            f"**/options** pour choisir d'autre options. Pour avoir de l'aide, appuyez sur **/help**.\n\nNB: Le bot n'est plus maintenue depuis un moment et ne serait donc plus mis à jour.")
+            f"**/options** pour choisir d'autre options. Pour avoir de l'aide, appuyez sur **/help**.")
 
     raise events.StopPropagation
 

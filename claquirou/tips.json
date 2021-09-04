@@ -11,7 +11,7 @@
     
     "METEO": "Astuce:\n**Pour avoir la météo⛈ d'une ville, écrivez juste le nom de la ville🗺**.\n__C'est cool non__🤗",
     
-    "END": "Merci d'avoir utilisé notre service 😉.\nPour afficher les options, appuyez sur **/options**\n\nNB: Le bot n'est plus maintenue depuis le 05/09/2020 et ne serait donc plus mis à jour.",
+    "END": "Merci d'avoir utilisé notre service 😉.\nPour afficher les options, appuyez sur **/options**.",
 
     "TIPS": "Vous êtes déjà dans une conversation, pour y mettre fin appuyez sur **/end** avant de pouvoir choisir d'autre options. Pour avoir de l'aide appuyez sur **/help.**"
 
