@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 import re
 import json
 
-from youtube_dl.extractor.common import InfoExtractor
-from youtube_dl.utils import ExtractorError
+from yt_dlp.extractor.common import InfoExtractor
+from yt_dlp.utils import ExtractorError
 
 
 class PinterestIE(InfoExtractor):
