@@ -7,9 +7,7 @@ from telethon.sessions import StringSession
 from .constant import PARAMS
 
 
-ADMIN_ID = [1468858929]
-USER_BLOCKED = []
-
+ADMIN_ID = [1816182296]
 
 config = configparser.ConfigParser()
 config.read(PARAMS)

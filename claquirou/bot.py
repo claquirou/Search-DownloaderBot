@@ -5,17 +5,14 @@ import asyncio
 from telethon import Button, events
 from telethon.errors import AlreadyInConversationError
 
-from claquirou.admin import typing_action, get_user_id, user_lang, new_logger, get_tip, new_user
-from claquirou.credential import ADMIN_ID, client
+from claquirou.admin import typing_action, user_lang, new_logger, get_tip, new_user
+from claquirou.credential import client
 from claquirou.image import send_images
 from claquirou.search import Search
 from worker.download import send_files, shutdown
 
 LANG = ["FR", "EN"]
 ADMIN_ID = [1816182296]
-
-fr_msg = "Désolé, ce bot n'est malheureusement plus disponible au grand public et nous vous présentons toutes nos excuses...\nA bientôt😉."
-en_msg = "Sorry, this bot is unfortunately no longer available to the general public and we apologize...\nSee you soon😉."
 
 
 @client.on(events.NewMessage(pattern="/start"))
@@ -37,10 +34,6 @@ async def language_button(event):
 
     if event.data == b"10":
         await event.delete()
-
-        if user.id not in ADMIN_ID:
-            await event.respond(fr_msg)
-            return
         
         other = get_tip("FR", "OTHER")
         await event.respond(f"Hello {user.first_name}.\n{other}")
@@ -48,10 +41,6 @@ async def language_button(event):
 
     elif event.data == b"20":
         await event.delete()
-
-        if user.id not in ADMIN_ID:
-            await event.respond(en_msg)
-            return
         
         other = get_tip("EN", "OTHER")
         await event.respond(f"Hello {user.first_name}.\n{other}")
@@ -63,23 +52,16 @@ async def helps(event):
     chat_id = event.chat_id
     lang = await user_lang(chat_id)
 
-    if chat_id not in ADMIN_ID:
-        if lang == LANG[0]:
-            await event.respond(fr_msg)
-            return
-
-        await event.respond(en_msg)
-
+    await typing_action(chat_id)
+    if lang == LANG[0]:
+        with open("claquirou/fr/help.txt", "r") as f:
+            data = f.read()
     else:
-        await typing_action(chat_id)
-        if lang == LANG[0]:
-            with open("claquirou/fr/help.txt", "r") as f:
-                data = f.read()
-        else:
-            with open("claquirou/en/help.txt", "r") as f:
-                data = f.read()
+        with open("claquirou/en/help.txt", "r") as f:
+            data = f.read()
 
-        await event.respond(data)
+    await event.respond(data)
+
     new_logger(chat_id).debug("USER TO PRESS HELP")
     raise events.StopPropagation
 
@@ -92,26 +74,19 @@ async def options(event):
     chat_id = event.chat_id
     lang = await user_lang(chat_id)
 
-    if chat_id not in ADMIN_ID:
-        if lang == LANG[0]:
-            await event.respond(fr_msg)
-            return
 
-        await event.respond(en_msg)
+    keyboard = [
+        [Button.inline(get_tip(lang, "CHOICE1"), b"1"),
+        Button.inline(get_tip(lang, "CHOICE2"), b"2")],
 
-    else:
-        keyboard = [
-            [Button.inline(get_tip(lang, "CHOICE1"), b"1"),
-            Button.inline(get_tip(lang, "CHOICE2"), b"2")],
+        [Button.inline(get_tip(lang, "CHOICE3"), b"3"),
+        Button.inline(get_tip(lang, "CHOICE4"), b"4")],
 
-            [Button.inline(get_tip(lang, "CHOICE3"), b"3"),
-            Button.inline(get_tip(lang, "CHOICE4"), b"4")],
+        [Button.inline(get_tip(lang, "CHOICE5"), b"5")]
+    ]
 
-            [Button.inline(get_tip(lang, "CHOICE5"), b"5")]
-        ]
-
-        loop.create_task(client.send_message(chat_id, get_tip(lang, "SELECT"), buttons=keyboard))
-        raise events.StopPropagation
+    loop.create_task(client.send_message(chat_id, get_tip(lang, "SELECT"), buttons=keyboard))
+    raise events.StopPropagation
 
 
 @client.on(events.CallbackQuery)
@@ -215,82 +190,9 @@ async def user_conversation(chat_id, tips, search=None, cmd=None):
 async def media(event):
     lang = await user_lang(event.chat_id)
 
-    if event.chat_id not in ADMIN_ID:
-        if lang == LANG[0]:
-            await event.respond(fr_msg)
-            return 
-
-        await event.respond(en_msg)
-
-    else:
-        if event.file or event.contact:
-            await event.reply(get_tip(lang, "FILE"), parse_mode="md")
-            new_logger(event.chat_id).debug("FILE")
-        return
-
-
-@client.on(events.NewMessage(pattern="/addAdmin"))
-async def admin(event):
-    chat_id = event.chat_id
-    loop.create_task(admin_conv(chat_id, func="add"))
-    raise events.StopPropagation
-
-
-@client.on(events.NewMessage(pattern="/delAdmin"))
-async def admin(event):
-    chat_id = event.chat_id
-    loop.create_task(admin_conv(chat_id, func="del"))
-    raise events.StopPropagation
-
-
-async def admin_conv(chat_id, func):
-
-    if chat_id not in ADMIN_ID:
-        return
-
-    lang = await user_lang(chat_id)
-
-    try:
-        async with client.conversation(chat_id, timeout=120) as conv:
-            await conv.send_message(f"Quel est le ID de l'utilisateur à ajouter?", parse_mode='md')
-
-            try:
-                continue_conv = True
-
-                while continue_conv:
-                    response = conv.get_response()
-                    response = await response
-
-                    if response.raw_text != "/end":
-                        if func == "add":
-                            try:
-                                ADMIN_ID.append(response.raw_text)
-                                await conv.send_message(f"Nouvel utilisateur ajouté.\n\nLa nouvelle liste est:\n{ADMIN_ID}")
-                            except Exception as e:
-                                await conv.send_message(e)
-                        
-                        else:
-                            try:
-                                if response.raw_text in ADMIN_ID:
-                                    ADMIN_ID.remove(response.raw_text)
-                                    await conv.send_message(f"L'utilisateur à bien été supprimé.\n\nLa nouvelle liste est:\n{ADMIN_ID}")
-                                else:
-                                    await conv.send_message("Cet utilisateur n'existe pas dans la liste.")
-                            except Exception as e:
-                                await conv.send_message(e)
-
-                    else:
-                        await conv.send_message("La liste des UTILISATEURS à bien été mis à jour.")
-                        continue_conv = False
-
-            except asyncio.TimeoutError:
-                timeout = get_tip(lang, "TIMEOUT")
-                await conv.send_message(timeout)
-
-
-    except AlreadyInConversationError:
-        await client.send_message(chat_id, get_tip(lang, "TIPS"))
-
+    if event.file or event.contact:
+        await event.reply(get_tip(lang, "FILE"), parse_mode="md")
+        new_logger(event.chat_id).debug("FILE")
 
 
 def sig_handler():

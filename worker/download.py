@@ -11,7 +11,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlparse, urlunparse
 
 import aiofiles
-import yt_dlp
+import youtube_dl
 from aiogram import Bot
 from claquirou.credential import TOKEN, ADMIN_ID
 from telethon.errors import AuthKeyDuplicatedError, BadRequestError
@@ -64,7 +64,7 @@ async def perform_task(client, chat_id, message, cmd, log, lang):
             else:
                 log.exception(e)
                 await client.send_message(chat_id, e.__str__())
-        except yt_dlp.DownloadError as e:
+        except youtube_dl.DownloadError as e:
             # crashing to try change ip
             # otherwise youtube.com will not allow us
             # to download any video for some time
@@ -201,8 +201,8 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                 params['ignoreerrors'] = True
                 params['playliststart'] = playlist_start
                 params['playlistend'] = playlist_end
-            else:
 
+            else:
                 if chat_id in ADMIN_ID:
                     params['playliststart'] = 1
                     params['playlistend'] = 500
@@ -210,7 +210,7 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                     params['playliststart'] = 1
                     params['playlistend'] = 15
 
-            ydl = yt_dlp.YoutubeDL(params=params)
+            ydl = youtube_dl.YoutubeDL(params=params)
             recover_playlist_index = None  # to save last playlist position if finding format failed
             for ip, pref_format in enumerate(preferred_formats):
                 try:
@@ -224,8 +224,8 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                             try:
                                 vinfo = await extract_url_info(ydl, u)
                                 if vinfo.get('age_limit') == 18 and is_ytb_link_re.search(vinfo.get('webpage_url', '')):
-                                    raise yt_dlp.DownloadError('youtube age limit')
-                            except yt_dlp.DownloadError as e:
+                                    raise youtube_dl.DownloadError('youtube age limit')
+                            except youtube_dl.DownloadError as e:
                                 # try to use invidious.snopyta.org youtube frontend to bypass 429 block
                                 if (e.exc_info is not None and e.exc_info[0] is HTTPError and e.exc_info[
                                     1].file.code == 429) or \
@@ -256,10 +256,10 @@ async def download_file(client, chat_id, message, cmd, log, lang):
 
                 except Exception as e:
                     if "Please log in or sign up to view this video" in str(e):
-                        if 'vk.com' in u:
-                            params['username'] = os.environ['VIDEO_ACCOUNT_USERNAME']
-                            params['password'] = os.environ['VIDEO_ACCOUNT_PASSWORD']
-                            ydl = yt_dlp.YoutubeDL(params=params)
+                        if 'fb.watch' or 'facebook.com' in u:
+                            params['username'] = "botclaquirou"
+                            params['password'] =  "02304428h"
+                            ydl = youtube_dl.YoutubeDL(params=params)
                             try:
                                 vinfo = await extract_url_info(ydl, u)
                             except Exception as e:
@@ -272,7 +272,7 @@ async def download_file(client, chat_id, message, cmd, log, lang):
                             continue
                     elif 'are video-only' in str(e):
                         params['format'] = 'bestvideo[ext=mp4]'
-                        ydl = yt_dlp.YoutubeDL(params=params)
+                        ydl = youtube_dl.YoutubeDL(params=params)
                         try:
                             vinfo = await extract_url_info(ydl, u)
                         except Exception as e:

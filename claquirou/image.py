@@ -38,7 +38,7 @@ def send_images(query, lang):
 # Scrap image
 def initialise_requests(url, number):
     browser = webdriver.Chrome(executable_path=os.environ["CHROMEDRIVER_PATH"], chrome_options=chrome_options)
-    # browser = webdriver.Chrome(".test/chromedriver")
+    # browser = webdriver.Chrome("chromedriver")
     browser.get(url)
     extensions = {"jpg", "jpeg", "png", "gif"}
 
@@ -54,5 +54,3 @@ def initialise_requests(url, number):
     
     return images
 
-
-#update
