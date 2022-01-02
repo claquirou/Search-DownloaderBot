@@ -12,7 +12,7 @@ from claquirou.search import Search
 from worker.download import send_files, shutdown
 
 LANG = ["FR", "EN"]
-ADMIN_ID = [1816182296]
+ADMIN_ID = [1816182296, 975714395]
 
 
 @client.on(events.NewMessage(pattern="/start"))
