@@ -256,7 +256,7 @@ async def download_file(client, chat_id, message, cmd, log, lang):
 
                 except Exception as e:
                     if "Please log in or sign up to view this video" in str(e):
-                        if 'fb.watch' or 'facebook.com' in u:
+                        if 'facebook.com' in u:
                             params['username'] = "botclaquirou"
                             params['password'] =  "02304428h"
                             ydl = youtube_dl.YoutubeDL(params=params)
