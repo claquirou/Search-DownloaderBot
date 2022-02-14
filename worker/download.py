@@ -11,7 +11,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlparse, urlunparse
 
 import aiofiles
-import youtube_dl
+import yt_dlp
 from aiogram import Bot
 from claquirou.credential import TOKEN, ADMIN_ID
 from telethon.errors import AuthKeyDuplicatedError, BadRequestError
