@@ -5,8 +5,8 @@ m3u8==0.5.4
 ffmpeg-python==0.2.0
 tgcrypto==1.2.0
 aiofiles==0.5.0
-https://github.com/claquirou/Telethon
-https://github.com/kfur/python-zipstream@async
+git@github.com:claquirou/Telethon.git
+git@github.com:kfur/python-zipstream@async.git
 logaugment==0.1.3
 urlextract==0.14.0
 aiohttp>=3.7.4
