@@ -7,7 +7,7 @@ from telethon.sessions import StringSession
 from .constant import PARAMS
 
 
-ADMIN_ID = [1816182296, 2070557403]
+ADMIN_ID = [1816182296]
 
 config = configparser.ConfigParser()
 config.read(PARAMS)
