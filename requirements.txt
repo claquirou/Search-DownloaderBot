@@ -1,6 +1,6 @@
 beautifulsoup4==4.9.0
 python-telegram-bot==12.5.1
-requests==2.23.0
+requests==2.31.0
 m3u8==0.5.4
 ffmpeg-python==0.2.0
 tgcrypto==1.2.0
